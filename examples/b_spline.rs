@@ -1,6 +1,6 @@
 use nalgebra::{Vector2, Vector3};
 use pixel_canvas::{Canvas, Color, Image, XY};
-use splinosaurus::splines::{ BSpline, NURBS, Spline };
+use splinosaurus::splines::{BSpline, Spline, NURBS};
 
 fn main() {
     let bspline = BSpline::new(
@@ -11,7 +11,7 @@ fn main() {
             Vector2::new(300., 300.),
             Vector2::new(300., 10.),
         ],
-        vec![0., 0., 0.,0., 2., 2., 2., 2.],
+        vec![0., 0., 0., 0., 2., 2., 2., 2.],
     );
 
     let nurbs = NURBS::new(

@@ -1,6 +1,6 @@
 mod algorithms;
-mod knot_vec;
 mod b_spline;
+mod knot_vec;
 mod nurbs;
 
 use crate::types::{Scalar, Vector};
