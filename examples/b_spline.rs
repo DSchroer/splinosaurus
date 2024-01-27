@@ -8,8 +8,8 @@ fn main() {
         vec![
             Vector2::new(10., 10.),
             Vector2::new(10., 300.),
-            Vector2::new(300., 300.),
-            Vector2::new(300., 10.),
+            Vector2::new(500., 300.),
+            Vector2::new(500., 500.),
         ],
         vec![0., 0., 0., 0., 2., 2., 2., 2.],
     );
@@ -19,8 +19,8 @@ fn main() {
         vec![
             Vector3::new(10., 10., 1.),
             Vector3::new(10., 300., 1.),
-            Vector3::new(300., 300., 1.),
-            Vector3::new(300., 10., 1.),
+            Vector3::new(500., 300., 0.),
+            Vector3::new(500., 500., 1.),
         ],
         vec![0., 0., 0., 0., 2., 2., 2., 2.],
     );
