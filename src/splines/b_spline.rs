@@ -1,5 +1,5 @@
-use crate::splines::algorithms::cox_de_boor;
-use crate::splines::knot_vec::KnotVec;
+use crate::algorithms::cox_de_boor;
+use crate::knot_vec::KnotVec;
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;

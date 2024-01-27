@@ -1,4 +1,4 @@
-use crate::splines::knot_vec::KnotVec;
+use crate::knot_vec::KnotVec;
 use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
