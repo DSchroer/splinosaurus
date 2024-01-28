@@ -67,7 +67,6 @@ where
 impl<D: Dim, T: Scalar, K: Knots<T>> Spline<D, T> for BSpline<D, T, K>
 where
     DefaultAllocator: Allocator<T, D>,
-    u8: Cast<T>,
 {
     fn min_u(&self) -> &T {
         self.knots.min_u()

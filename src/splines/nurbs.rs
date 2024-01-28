@@ -3,7 +3,6 @@ use crate::knots::Knots;
 use crate::splines::BSpline;
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
-use az::Cast;
 use nalgebra::allocator::Allocator;
 use nalgebra::{Const, DefaultAllocator, Dim, DimDiff, DimName, DimSub, U1};
 
@@ -31,7 +30,6 @@ where
     <D as DimSub<Const<1>>>::Output: DimName,
     DefaultAllocator: Allocator<T, D>,
     DefaultAllocator: Allocator<T, <D as DimSub<Const<1>>>::Output>,
-    u8: Cast<T>,
 {
     fn min_u(&self) -> &T {
         self.b_spline.min_u()

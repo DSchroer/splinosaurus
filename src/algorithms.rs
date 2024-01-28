@@ -1,6 +1,5 @@
 use crate::knots::Knots;
 use crate::types::{Scalar, Vector};
-use az::Cast;
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
 
@@ -12,7 +11,6 @@ pub fn cox_de_boor<D: Dim, T: Scalar>(
 ) -> Vector<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
-    u8: Cast<T>,
 {
     assert!(u >= *knots.min_u() && u <= *knots.max_u(), "u out of range");
 
@@ -28,7 +26,7 @@ where
         for j in (r..degree + 1).rev() {
             let kp = knots.as_slice()[j + k - degree];
             let alpha = (u - kp) / (knots.as_slice()[1 + j + k - r] - kp);
-            let nalpha = T::from(1u8) - alpha;
+            let nalpha = T::one() - alpha;
             d[j] = d[j - 1].clone() * nalpha + d[j].clone() * alpha;
         }
     }
