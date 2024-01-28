@@ -12,15 +12,15 @@ pub trait Spline<D: Dim, T: Scalar + 'static>: Sized
 where
     DefaultAllocator: nalgebra::allocator::Allocator<T, D>,
 {
-    fn min_u(&self) -> T;
-    fn max_u(&self) -> T;
+    fn min_u(&self) -> &T;
+    fn max_u(&self) -> &T;
     fn at(&self, u: T) -> Vector<D, T>;
 
     fn quantize(&self, step: T) -> SplineQuantize<D, T, Self> {
         SplineQuantize {
             spline: self,
             step,
-            position: self.min_u(),
+            position: *self.min_u(),
             _dim: Default::default(),
         }
     }
@@ -46,9 +46,9 @@ where
         let position = self.position;
         self.position += self.step;
 
-        if position < self.spline.max_u() && self.position >= self.spline.max_u() {
-            Some(self.spline.at(self.spline.max_u()))
-        } else if position < self.spline.max_u() {
+        if position < *self.spline.max_u() && self.position >= *self.spline.max_u() {
+            Some(self.spline.at(*self.spline.max_u()))
+        } else if position < *self.spline.max_u() {
             Some(self.spline.at(position))
         } else {
             None

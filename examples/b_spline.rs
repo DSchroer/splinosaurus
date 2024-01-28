@@ -1,28 +1,16 @@
-use nalgebra::{Vector2, Vector3};
+use nalgebra::Vector2;
 use pixel_canvas::{Canvas, Color, Image, XY};
-use splinosaurus::splines::{BSpline, Spline, NURBS};
+use splinosaurus::splines::{BSpline, Spline};
 
 fn main() {
-    let bspline = BSpline::new(
-        3,
+    let bspline = BSpline::new_uniform_clamped(
+        2,
         vec![
             Vector2::new(10., 10.),
             Vector2::new(10., 300.),
-            Vector2::new(500., 300.),
-            Vector2::new(500., 500.),
+            Vector2::new(300., 300.),
+            Vector2::new(300., 10.),
         ],
-        vec![0., 0., 0., 0., 2., 2., 2., 2.],
-    );
-
-    let nurbs = NURBS::new(
-        3,
-        vec![
-            Vector3::new(10., 10., 1.),
-            Vector3::new(10., 300., 1.),
-            Vector3::new(500., 300., 0.),
-            Vector3::new(500., 500., 1.),
-        ],
-        vec![0., 0., 0., 0., 2., 2., 2., 2.],
     );
 
     let canvas = Canvas::new(512, 512).title("Tile");
@@ -34,10 +22,6 @@ fn main() {
 
         for p in bspline.quantize(0.05) {
             drawer.point(p[0] as usize, p[1] as usize, 5, Color::rgb(255, 0, 0));
-        }
-
-        for p in nurbs.quantize(0.05) {
-            drawer.point(p[0] as usize, p[1] as usize, 5, Color::rgb(0, 255, 0));
         }
 
         for point in bspline.control_points() {

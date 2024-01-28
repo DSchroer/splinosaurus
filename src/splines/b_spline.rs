@@ -1,40 +1,48 @@
 use crate::algorithms::cox_de_boor;
-use crate::knot_vec::KnotVec;
+use crate::knots::{Clamped, Knots};
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
+use az::Cast;
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
 
-pub struct BSpline<D: Dim, T: Scalar>
+pub struct BSpline<D: Dim, T: Scalar, K: Knots<T>>
 where
     DefaultAllocator: Allocator<T, D>,
 {
     control_points: Vec<Vector<D, T>>,
-    knots: KnotVec<T>,
+    knots: K,
     degree: usize,
 }
 
-impl<D: Dim, T: Scalar> BSpline<D, T>
+impl<D: Dim, T: Scalar> BSpline<D, T, Clamped<T>>
+where
+    DefaultAllocator: Allocator<T, D>,
+    usize: Cast<T>,
+{
+    pub fn new_uniform_clamped(degree: usize, control_points: Vec<Vector<D, T>>) -> Self {
+        let knots = Clamped::new_uniform(degree, control_points.len());
+        Self::new(degree, control_points, knots)
+    }
+}
+
+impl<D: Dim, T: Scalar, K: Knots<T>> BSpline<D, T, K>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub fn new(degree: usize, control_points: Vec<Vector<D, T>>, knots: Vec<T>) -> Self {
+    pub fn new(degree: usize, control_points: Vec<Vector<D, T>>, knots: K) -> Self {
         assert_ne!(0, degree, "degree must be positive");
         assert!(
             degree < control_points.len(),
             "insufficient control points, must have at least {}",
             degree + 1
         );
-
         let expected_knots = degree + control_points.len() + 1;
         assert_eq!(
             knots.len(),
             expected_knots,
             "insufficient knots, must have {expected_knots}"
         );
-
-        let knots: KnotVec<T> = knots.into();
-        assert!(knots.is_clamped(degree));
 
         Self {
             degree,
@@ -43,7 +51,7 @@ where
         }
     }
 
-    pub fn knots(&self) -> &KnotVec<T> {
+    pub fn knots(&self) -> &K {
         &self.knots
     }
 
@@ -56,15 +64,16 @@ where
     }
 }
 
-impl<D: Dim, T: Scalar> Spline<D, T> for BSpline<D, T>
+impl<D: Dim, T: Scalar, K: Knots<T>> Spline<D, T> for BSpline<D, T, K>
 where
     DefaultAllocator: Allocator<T, D>,
+    u8: Cast<T>,
 {
-    fn min_u(&self) -> T {
+    fn min_u(&self) -> &T {
         self.knots.min_u()
     }
 
-    fn max_u(&self) -> T {
+    fn max_u(&self) -> &T {
         self.knots.max_u()
     }
 

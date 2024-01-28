@@ -1,6 +1,5 @@
+use az::Cast;
 use nalgebra::DefaultAllocator;
-use num_traits::identities::One;
-use num_traits::Zero;
 use std::fmt::Debug;
 use std::ops::*;
 
@@ -14,11 +13,13 @@ pub trait Scalar:
     + MulAssign
     + Sub<Output = Self>
     + Div<Output = Self>
-    + One
-    + Zero
+    + Cast<f64>
     + Default
     + 'static
 {
+    fn from<T: Cast<Self>>(value: T) -> Self {
+        Cast::cast(value)
+    }
 }
 
 impl<T> Scalar for T where
@@ -31,8 +32,7 @@ impl<T> Scalar for T where
         + MulAssign
         + Sub<Output = Self>
         + Div<Output = Self>
-        + One
-        + Zero
+        + Cast<f64>
         + Default
         + 'static
 {
@@ -40,3 +40,19 @@ impl<T> Scalar for T where
 
 pub type Vector<D, T> =
     nalgebra::Vector<T, D, <DefaultAllocator as nalgebra::allocator::Allocator<T, D>>::Buffer>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use fixed::types::extra::U3;
+
+    #[test]
+    fn it_casts_to_scalar() {
+        fn thing(_: impl Scalar) {}
+
+        thing(0f64);
+        thing(0f32);
+        thing(0f32);
+        thing(fixed::FixedI64::<U3>::default());
+    }
+}

@@ -1,4 +1,4 @@
 mod algorithms;
-mod knot_vec;
+mod knots;
 pub mod splines;
 mod types;
