@@ -1,12 +1,13 @@
 use crate::algorithms::cox_de_boor;
-use crate::knots::{Clamped, Knots};
+use crate::knots::{Clamped, Knots, Open};
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
 use az::Cast;
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
 
-pub struct BSpline<D: Dim, T: Scalar, K: Knots<T>>
+#[derive(Debug, Clone)]
+pub struct BSpline<D: Dim, T: Scalar, K: Knots>
 where
     DefaultAllocator: Allocator<T, D>,
 {
@@ -15,10 +16,9 @@ where
     degree: usize,
 }
 
-impl<D: Dim, T: Scalar> BSpline<D, T, Clamped<T>>
+impl<D: Dim, T: Scalar> BSpline<D, T, Clamped>
 where
     DefaultAllocator: Allocator<T, D>,
-    usize: Cast<T>,
 {
     pub fn new_uniform_clamped(degree: usize, control_points: Vec<Vector<D, T>>) -> Self {
         let knots = Clamped::new_uniform(degree, control_points.len());
@@ -26,7 +26,17 @@ where
     }
 }
 
-impl<D: Dim, T: Scalar, K: Knots<T>> BSpline<D, T, K>
+impl<D: Dim, T: Scalar> BSpline<D, T, Open>
+where
+    DefaultAllocator: Allocator<T, D>,
+{
+    pub fn new_uniform_open(degree: usize, control_points: Vec<Vector<D, T>>) -> Self {
+        let knots = Open::new_uniform(degree, control_points.len());
+        Self::new(degree, control_points, knots)
+    }
+}
+
+impl<D: Dim, T: Scalar, K: Knots> BSpline<D, T, K>
 where
     DefaultAllocator: Allocator<T, D>,
 {
@@ -64,15 +74,15 @@ where
     }
 }
 
-impl<D: Dim, T: Scalar, K: Knots<T>> Spline<D, T> for BSpline<D, T, K>
+impl<D: Dim, T: Scalar, K: Knots> Spline<D, T> for BSpline<D, T, K>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    fn min_u(&self) -> &T {
+    fn min_u(&self) -> &usize {
         self.knots.min_u()
     }
 
-    fn max_u(&self) -> &T {
+    fn max_u(&self) -> &usize {
         self.knots.max_u()
     }
 

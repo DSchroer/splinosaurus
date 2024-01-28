@@ -6,13 +6,13 @@ fn main() {
     let bspline = BSpline::new_uniform_clamped(
         2,
         vec![
-            Vector2::new(10., 10.),
-            Vector2::new(10., 300.),
+            Vector2::new(50., 50.),
+            Vector2::new(50., 300.),
             Vector2::new(300., 300.),
-            Vector2::new(300., 10.),
         ],
     );
 
+    println!("rendering {:?}", bspline);
     let canvas = Canvas::new(512, 512).title("Tile");
 
     // The canvas will render for you at up to 60fps.

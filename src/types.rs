@@ -1,4 +1,4 @@
-use az::Cast;
+use az::{Cast, CastFrom};
 use nalgebra::DefaultAllocator;
 use std::fmt::Debug;
 use std::ops::*;
@@ -13,17 +13,13 @@ pub trait Scalar:
     + MulAssign
     + Sub<Output = Self>
     + Div<Output = Self>
-    + Cast<f64>
-    + From<u8>
+    + Cast<usize>
+    + CastFrom<usize>
     + Default
     + 'static
 {
-    fn from<T: Cast<Self>>(value: T) -> Self {
-        Cast::cast(value)
-    }
-
     fn one() -> Self {
-        1.into()
+        Self::cast_from(1)
     }
 }
 
@@ -37,11 +33,10 @@ impl<T> Scalar for T where
         + MulAssign
         + Sub<Output = Self>
         + Div<Output = Self>
-        + Cast<f64>
-        + From<u8>
+        + Cast<usize>
+        + CastFrom<usize>
         + Default
         + 'static
-
 {
 }
 
@@ -69,6 +64,9 @@ mod tests {
 
         thing(Vector2::new(0f64, 0f64));
         thing(Vector2::new(0f32, 0f32));
-        thing(Vector2::new(fixed::FixedI64::<U3>::default(), fixed::FixedI64::<U3>::default()));
+        thing(Vector2::new(
+            fixed::FixedI64::<U3>::default(),
+            fixed::FixedI64::<U3>::default(),
+        ));
     }
 }

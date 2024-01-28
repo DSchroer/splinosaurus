@@ -2,24 +2,23 @@ use crate::types::Scalar;
 use az::Cast;
 use std::fmt::Debug;
 
-pub trait Knots<T: Scalar>: Sized {
-    fn as_slice(&self) -> &[T];
-    fn min_u(&self) -> &T {
-        self.as_slice().first().unwrap()
+pub trait Knots: AsRef<[usize]> + Sized {
+    fn min_u(&self) -> &usize {
+        self.as_ref().first().unwrap()
     }
-    fn max_u(&self) -> &T {
-        self.as_slice().last().unwrap()
+    fn max_u(&self) -> &usize {
+        self.as_ref().last().unwrap()
     }
 
     fn len(&self) -> usize {
-        self.as_slice().len()
+        self.as_ref().len()
     }
 
     fn is_empty(&self) -> bool {
         false
     }
 
-    fn find_span(&self, u: T) -> usize {
+    fn find_span(&self, u: usize) -> usize {
         debug_assert!(
             u >= *self.min_u(),
             "parameter u={:?} is below the required range {:?} <= u <= {:?}",
@@ -35,42 +34,28 @@ pub trait Knots<T: Scalar>: Sized {
             self.max_u()
         );
 
-        if u == *self.max_u() {
-            // if we have the maximum u value then handle that as a special case;
-            // look backward through the knots until we find one which is less
-            // than the maximum u value
-            self.as_slice()
-                .iter()
-                .enumerate()
-                .rev()
-                .find(|&item| item.1 < &u)
-                .unwrap()
-                .0
-        } else {
-            // perform a binary search to find the correct knot span
-            let mut low: usize = 0;
-            let mut high: usize = self.len() - 1;
-            let mut mid: usize = (low + high) / 2;
+        let mut low: usize = 0;
+        let mut high: usize = self.len() - 1;
+        let mut mid: usize = (low + high) / 2;
 
-            while u < self.as_slice()[mid] || u >= self.as_slice()[mid + 1] {
-                if u < self.as_slice()[mid] {
-                    high = mid;
-                } else {
-                    low = mid;
-                }
-                mid = (low + high) / 2;
+        while (u < self.as_ref()[mid] || u >= self.as_ref()[mid + 1]) && mid < self.len() - 2 {
+            if u < self.as_ref()[mid] {
+                high = mid;
+            } else {
+                low = mid;
             }
-
-            mid
+            mid = (low + high) / 2;
         }
+
+        mid
     }
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct Clamped<T>(Vec<T>);
+pub struct Clamped(Vec<usize>);
 
-impl<T: Scalar> Clamped<T> {
-    pub fn new_with_clamps(degree: usize, mut v: Vec<T>) -> Self {
+impl Clamped {
+    pub fn new_with_clamps(degree: usize, mut v: Vec<usize>) -> Self {
         for _ in 0..degree - 1 {
             v.insert(0, v[0]);
         }
@@ -81,32 +66,55 @@ impl<T: Scalar> Clamped<T> {
     }
 }
 
-impl<T: Scalar> Clamped<T>
-where
-    usize: Cast<T>,
-{
+impl Clamped {
     pub fn new_uniform(degree: usize, num_points: usize) -> Self {
         let vec_size = degree + num_points + 1;
         let mut data = Vec::with_capacity(vec_size);
-        let step = num_points.cast() / (vec_size - 5).cast();
+        let knots = vec_size - (degree * 2);
         for _ in 0..degree {
             data.push(0.cast())
         }
-        for i in 0..(vec_size - 4) {
-            data.push(step * i.cast())
+        for i in 0..knots {
+            data.push(i)
         }
         for _ in 0..degree {
-            data.push(num_points.cast())
+            data.push(knots - 1)
         }
+        debug_assert_eq!(vec_size, data.len());
         Self(data)
     }
 }
 
-impl<T: Scalar> Knots<T> for Clamped<T> {
-    fn as_slice(&self) -> &[T] {
+impl AsRef<[usize]> for Clamped {
+    fn as_ref(&self) -> &[usize] {
         &self.0
     }
 }
+
+impl Knots for Clamped {}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct Open(Vec<usize>);
+
+impl Open {
+    pub fn new_uniform(degree: usize, num_points: usize) -> Self {
+        let vec_size = degree + num_points + 1;
+        let mut data = Vec::with_capacity(vec_size);
+        for i in 0..vec_size {
+            data.push(i)
+        }
+        debug_assert_eq!(vec_size, data.len());
+        Self(data)
+    }
+}
+
+impl AsRef<[usize]> for Open {
+    fn as_ref(&self) -> &[usize] {
+        &self.0
+    }
+}
+
+impl Knots for Open {}
 
 #[cfg(test)]
 mod tests {
@@ -115,15 +123,18 @@ mod tests {
     #[test]
     pub fn it_clamps_ends() {
         let c = Clamped::new_with_clamps(3, vec![1, 2, 3]);
-
-        assert_eq!(&[1, 1, 1, 2, 3, 3, 3], c.as_slice());
+        assert_eq!(&[1, 1, 1, 2, 3, 3, 3], c.as_ref());
     }
 
     #[test]
-    pub fn it_can_be_created() {
-        let c = Clamped::<f64>::new_uniform(2, 4);
+    pub fn it_can_create_uniform_clamped() {
+        let c = Clamped::new_uniform(2, 4);
+        assert_eq!(&[0, 0, 0, 1, 2, 2, 2], c.as_ref());
+    }
 
-        dbg!(&c);
-        assert_eq!(&[0., 0., 0., 2., 4., 4., 4.], c.as_slice());
+    #[test]
+    pub fn it_can_create_uniform_open() {
+        let c = Open::new_uniform(2, 3);
+        assert_eq!(&[0, 1, 2, 3, 4, 5], c.as_ref());
     }
 }
