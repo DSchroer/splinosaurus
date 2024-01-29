@@ -1,120 +1,117 @@
 use crate::types::Scalar;
 use az::Cast;
-use std::fmt::Debug;
+use std::fmt::{Debug, Formatter};
+use std::ops::Index;
 
-pub trait Knots: AsRef<[usize]> + Sized {
-    fn min_u(&self) -> &usize {
-        self.as_ref().first().unwrap()
-    }
-    fn max_u(&self) -> &usize {
-        self.as_ref().last().unwrap()
+pub trait Knots {
+    fn min_u(&self) -> usize;
+    fn max_u(&self) -> usize;
+    fn find_span(&self, u: usize) -> usize;
+    fn knot(&self, index: usize) -> usize;
+}
+
+#[derive(Debug, Clone)]
+pub struct KnotVec(pub Vec<usize>);
+
+impl Knots for KnotVec {
+    fn min_u(&self) -> usize {
+        *self.0.first().unwrap()
     }
 
-    fn len(&self) -> usize {
-        self.as_ref().len()
-    }
-
-    fn is_empty(&self) -> bool {
-        false
+    fn max_u(&self) -> usize {
+        *self.0.last().unwrap()
     }
 
     fn find_span(&self, u: usize) -> usize {
-        debug_assert!(
-            u >= *self.min_u(),
-            "parameter u={:?} is below the required range {:?} <= u <= {:?}",
-            u,
-            self.min_u(),
-            self.max_u()
-        );
-        debug_assert!(
-            u <= *self.max_u(),
-            "parameter u={:?} is above the required range {:?} <= u <= {:?}",
-            u,
-            self.min_u(),
-            self.max_u()
-        );
+        if u == self.max_u() {
+            // if we have the maximum u value then handle that as a special case;
+            // look backward through the knots until we find one which is less
+            // than the maximum u value
+            self.0
+                .iter()
+                .enumerate()
+                .rev()
+                .find(|&item| item.1 < &u)
+                .unwrap()
+                .0
+        } else {
+            // perform a binary search to find the correct knot span
+            let mut low: usize = 0;
+            let mut high: usize = self.0.len() - 1;
+            let mut mid: usize = (low + high) / 2;
 
-        let mut low: usize = 0;
-        let mut high: usize = self.len() - 1;
-        let mut mid: usize = (low + high) / 2;
-
-        while (u < self.as_ref()[mid] || u >= self.as_ref()[mid + 1]) && mid < self.len() - 2 {
-            if u < self.as_ref()[mid] {
-                high = mid;
-            } else {
-                low = mid;
+            while u < self.0[mid] || u >= self.0[mid + 1] {
+                if u < self.0[mid] {
+                    high = mid;
+                } else {
+                    low = mid;
+                }
+                mid = (low + high) / 2;
             }
-            mid = (low + high) / 2;
-        }
 
-        mid
+            mid
+        }
+    }
+
+    fn knot(&self, index: usize) -> usize {
+        self.0[index]
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct Clamped(Vec<usize>);
+#[derive(Clone)]
+pub struct UniformClamped {
+    degree: usize,
+    points: usize,
+}
 
-impl Clamped {
-    pub fn new_with_clamps(degree: usize, mut v: Vec<usize>) -> Self {
-        for _ in 0..degree - 1 {
-            v.insert(0, v[0]);
+impl UniformClamped {
+    pub fn new(degree: usize, points: usize) -> Self {
+        Self { degree, points }
+    }
+
+    fn as_vec(&self) -> Vec<usize> {
+        let mut v = Vec::new();
+        for u in 0..self.points + self.degree + 1 {
+            v.push(self.knot(u))
         }
-        for _ in 0..degree - 1 {
-            v.push(v[v.len() - 1]);
-        }
-        Self(v)
+        debug_assert_eq!(self.points + self.degree + 1, v.len());
+        v
     }
 }
 
-impl Clamped {
-    pub fn new_uniform(degree: usize, num_points: usize) -> Self {
-        let vec_size = degree + num_points + 1;
-        let mut data = Vec::with_capacity(vec_size);
-        let knots = vec_size - (degree * 2);
-        for _ in 0..degree {
-            data.push(0.cast())
-        }
-        for i in 0..knots {
-            data.push(i)
-        }
-        for _ in 0..degree {
-            data.push(knots - 1)
-        }
-        debug_assert_eq!(vec_size, data.len());
-        Self(data)
+impl Debug for UniformClamped {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_list().entries(self.as_vec()).finish()
     }
 }
 
-impl AsRef<[usize]> for Clamped {
-    fn as_ref(&self) -> &[usize] {
-        &self.0
+impl Knots for UniformClamped {
+    fn min_u(&self) -> usize {
+        0
     }
-}
 
-impl Knots for Clamped {}
+    fn max_u(&self) -> usize {
+        (self.points + self.degree) - (self.degree * 2)
+    }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct Open(Vec<usize>);
-
-impl Open {
-    pub fn new_uniform(degree: usize, num_points: usize) -> Self {
-        let vec_size = degree + num_points + 1;
-        let mut data = Vec::with_capacity(vec_size);
-        for i in 0..vec_size {
-            data.push(i)
+    fn find_span(&self, u: usize) -> usize {
+        if u == self.max_u() {
+            self.degree + u - 1
+        } else {
+            self.degree + u
         }
-        debug_assert_eq!(vec_size, data.len());
-        Self(data)
+    }
+
+    fn knot(&self, index: usize) -> usize {
+        if index < self.degree {
+            self.min_u()
+        } else if index < self.points {
+            (index) - (self.degree)
+        } else {
+            self.max_u()
+        }
     }
 }
-
-impl AsRef<[usize]> for Open {
-    fn as_ref(&self) -> &[usize] {
-        &self.0
-    }
-}
-
-impl Knots for Open {}
 
 #[cfg(test)]
 mod tests {
@@ -122,19 +119,20 @@ mod tests {
 
     #[test]
     pub fn it_clamps_ends() {
-        let c = Clamped::new_with_clamps(3, vec![1, 2, 3]);
-        assert_eq!(&[1, 1, 1, 2, 3, 3, 3], c.as_ref());
+        let c = UniformClamped::new(3, 4);
+        assert_eq!(vec![0, 0, 0, 0, 1, 1, 1, 1], c.as_vec());
+
+        let c = UniformClamped::new(3, 5);
+        assert_eq!(vec![0, 0, 0, 0, 1, 2, 2, 2, 2], c.as_vec());
+
+        let c = UniformClamped::new(2, 3);
+        assert_eq!(vec![0, 0, 0, 1, 1, 1], c.as_vec());
     }
 
     #[test]
-    pub fn it_can_create_uniform_clamped() {
-        let c = Clamped::new_uniform(2, 4);
-        assert_eq!(&[0, 0, 0, 1, 2, 2, 2], c.as_ref());
-    }
-
-    #[test]
-    pub fn it_can_create_uniform_open() {
-        let c = Open::new_uniform(2, 3);
-        assert_eq!(&[0, 1, 2, 3, 4, 5], c.as_ref());
+    pub fn it_finds_spans_in_clamp() {
+        let c = UniformClamped::new(3, 4);
+        assert_eq!(3, c.find_span(0));
+        assert_eq!(3, c.find_span(1));
     }
 }

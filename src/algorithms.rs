@@ -14,7 +14,7 @@ where
     DefaultAllocator: Allocator<T, D>,
 {
     assert!(
-        u.cast() >= *knots.min_u() && u.cast() <= *knots.max_u(),
+        u.cast() >= knots.min_u() && u.cast() <= knots.max_u(),
         "u out of range"
     );
 
@@ -22,20 +22,20 @@ where
 
     let mut d = Vec::with_capacity(degree + 1); // homogeneous points
     for j in 0..degree + 1 {
-        let i = (j + k).wrapping_sub(degree) % control_points.len();
+        let i = j + k - degree;
         d.push(control_points[i].clone());
     }
 
-    let knots = knots.as_ref();
     for r in 1..degree + 1 {
         for j in (r..degree + 1).rev() {
-            let kp = T::cast_from(knots[(j + k).wrapping_sub(degree) % knots.len()]);
-            let kp_1 = T::cast_from(knots[(1 + j + k).wrapping_sub(r) % knots.len()].cast());
+            let kp = T::cast_from(knots.knot(j + k - degree));
+            let kp_1 = T::cast_from(knots.knot(1 + j + k - r));
             let alpha = (u - kp) / (kp_1 - kp);
             let n_alpha = T::one() - alpha;
             d[j] = d[j - 1].clone() * n_alpha + d[j].clone() * alpha;
         }
     }
 
+    println!("{u:?} => {:?}", d[degree]);
     d[degree].clone()
 }

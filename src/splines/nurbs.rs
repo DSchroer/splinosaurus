@@ -31,11 +31,11 @@ where
     DefaultAllocator: Allocator<T, D>,
     DefaultAllocator: Allocator<T, <D as DimSub<Const<1>>>::Output>,
 {
-    fn min_u(&self) -> &usize {
+    fn min_u(&self) -> usize {
         self.b_spline.min_u()
     }
 
-    fn max_u(&self) -> &usize {
+    fn max_u(&self) -> usize {
         self.b_spline.max_u()
     }
 

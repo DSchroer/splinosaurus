@@ -1,5 +1,6 @@
 use nalgebra::Vector2;
 use pixel_canvas::{Canvas, Color, Image, XY};
+use splinosaurus::knots::KnotVec;
 use splinosaurus::splines::{BSpline, Spline};
 
 fn main() {
@@ -9,6 +10,7 @@ fn main() {
             Vector2::new(50., 50.),
             Vector2::new(50., 300.),
             Vector2::new(300., 300.),
+            Vector2::new(300., 500.),
         ],
     );
 
