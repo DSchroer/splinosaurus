@@ -6,7 +6,7 @@ use nalgebra::{DefaultAllocator, Dim};
 use std::marker::PhantomData;
 
 pub use b_spline::BSpline;
-pub use nurbs::NURBS;
+// pub use nurbs::NURBS;
 
 pub trait Spline<D: Dim, T: Scalar + 'static>: Sized
 where

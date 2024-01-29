@@ -1,14 +1,14 @@
 use crate::knots::Knots;
 use crate::types::{Scalar, Vector};
-use az::Cast;
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
+use crate::control_points::ControlPoints;
 
 pub fn cox_de_boor<D: Dim, T: Scalar>(
     u: T,
     degree: usize,
     knots: &impl Knots,
-    control_points: &[Vector<D, T>],
+    control_points: &impl ControlPoints<Vector<D, T>>,
 ) -> Vector<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
@@ -36,6 +36,5 @@ where
         }
     }
 
-    println!("{u:?} => {:?}", d[degree]);
     d[degree].clone()
 }

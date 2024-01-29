@@ -1,8 +1,7 @@
 use crate::algorithms::cox_de_boor;
-use crate::knots::{Knots, UniformClamped};
+use crate::knots::{Knots, Uniform};
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
-use az::Cast;
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
 
@@ -16,12 +15,12 @@ where
     degree: usize,
 }
 
-impl<D: Dim, T: Scalar> BSpline<D, T, UniformClamped>
+impl<D: Dim, T: Scalar> BSpline<D, T, Uniform>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub fn new_uniform_clamped(degree: usize, control_points: Vec<Vector<D, T>>) -> Self {
-        let knots = UniformClamped::new(degree, control_points.len());
+    pub fn new_uniform(degree: usize, control_points: Vec<Vector<D, T>>) -> Self {
+        let knots = Uniform::new(degree, control_points.len());
         Self::new(degree, control_points, knots)
     }
 }
