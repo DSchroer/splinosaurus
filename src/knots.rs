@@ -113,4 +113,3 @@ impl Knots for Clamped {
         }
     }
 }
-

@@ -6,6 +6,7 @@ use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;
 use nalgebra::{Const, DefaultAllocator, Dim, DimDiff, DimName, DimSub, U1};
 
+#[derive(Debug)]
 pub struct NURBS<D: Dim, T: Scalar, K: Knots>
 where
     DefaultAllocator: Allocator<T, D>,
@@ -13,23 +14,30 @@ where
     b_spline: BSpline<D, T, K>,
 }
 
+impl<D: Dim, T: Scalar, K: Knots> From<BSpline<D, T, K>> for NURBS<D, T, K>
+where
+    DefaultAllocator: Allocator<T, D>,
+{
+    fn from(b_spline: BSpline<D, T, K>) -> Self {
+        Self { b_spline }
+    }
+}
+
 impl<D: Dim, T: Scalar, K: Knots> NURBS<D, T, K>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub fn new(degree: usize, control_points: Vec<Vector<D, T>>, knots: K) -> Self {
-        Self {
-            b_spline: BSpline::new(degree, control_points, knots),
-        }
+    pub fn control_points(&self) -> &[Vector<D, T>] {
+        self.b_spline.control_points()
     }
 }
 
-impl<D: Dim, T: Scalar, K: Knots> Spline<DimDiff<D, U1>, T> for NURBS<D, T, K>
+impl<D: Dim + DimSub<U1>, T: Scalar, K: Knots> Spline<DimDiff<D, U1>, T> for NURBS<D, T, K>
 where
-    D: Dim + DimSub<U1, Output = usize>,
     <D as DimSub<Const<1>>>::Output: DimName,
     DefaultAllocator: Allocator<T, D>,
     DefaultAllocator: Allocator<T, <D as DimSub<Const<1>>>::Output>,
+    <DefaultAllocator as Allocator<T, <D as DimSub<Const<1>>>::Output>>::Buffer: Default,
 {
     fn min_u(&self) -> usize {
         self.b_spline.min_u()
@@ -54,8 +62,7 @@ where
             })
             .collect();
         let higher = cox_de_boor(u, self.b_spline.degree(), self.b_spline.knots(), &points);
-        let mut lower =
-            Vector::<DimDiff<D, U1>, T>::repeat_generic(higher.len() - 1, U1, T::default());
+        let mut lower = Vector::<DimDiff<D, U1>, T>::default();
         for i in 0..lower.len() {
             lower[i] = higher[i] / higher[higher.len() - 1];
         }

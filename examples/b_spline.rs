@@ -1,17 +1,17 @@
-use nalgebra::Vector2;
+use nalgebra::Vector3;
 use pixel_canvas::{Canvas, Color, Image, XY};
-use splinosaurus::splines::{BSpline, Spline};
+use splinosaurus::splines::{BSpline, Spline, NURBS};
 
 fn main() {
-    let spline = BSpline::new_uniform(
+    let spline: NURBS<_, _, _> = BSpline::new_uniform(
         2,
         vec![
-            Vector2::new(50., 50.),
-            Vector2::new(50., 300.),
-            Vector2::new(300., 300.),
-            Vector2::new(300., 500.),
+            Vector3::new(100., 50., 1.),
+            Vector3::new(200., 50. + 173.2, 1.),
+            Vector3::new(300., 50., 1.),
         ],
-    );
+    )
+    .into();
 
     println!("rendering {:?}", spline);
     let canvas = Canvas::new(512, 512).title("Tile");
