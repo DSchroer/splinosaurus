@@ -19,7 +19,7 @@ fn main() {
     let canvas = Canvas::new(512, 512).title("Tile");
 
     // The canvas will render for you at up to 60fps.
-    canvas.render_on_change(true).render(move |_, image| {
+    canvas.render(move |_, image| {
         image.fill(Color::WHITE);
         let mut drawer = Drawer { image };
 
