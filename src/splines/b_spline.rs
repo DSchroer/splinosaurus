@@ -1,7 +1,7 @@
 use crate::algorithms::cox_de_boor;
 use crate::control_points::ControlPoints;
 use crate::knots::Knots;
-use crate::splines::Spline;
+use crate::splines::{NURBS, Spline};
 use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
@@ -45,6 +45,10 @@ where
 
     pub fn degree(&self) -> usize {
         self.control_points.degree()
+    }
+
+    pub fn nurbs(&self) -> NURBS<D, T> {
+        NURBS::new(self)
     }
 }
 
