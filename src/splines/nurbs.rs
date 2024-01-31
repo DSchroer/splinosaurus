@@ -35,20 +35,14 @@ where
     }
 
     fn at(&self, u: T) -> Vector<DimDiff<D, U1>, T> {
-        let points: Vec<Vector<D, T>> = self
-            .spline
-            .control_points()
-            .iter()
-            .map(|p| {
-                let mut weighted = p.clone();
-                for i in 0..p.len() - 1 {
-                    let w = weighted[i] * weighted[weighted.len() - 1];
-                    weighted[i] = w;
-                }
-                weighted
-            })
-            .collect();
-        let higher = cox_de_boor(u, self.spline.degree(), self.spline.knots(), &points);
+        let higher = cox_de_boor(u, self.spline.degree(), self.spline.knots(), |i| {
+            let mut weighted = self.spline.control_points()[i].clone();
+            for i in 0..weighted.len() - 1 {
+                let w = weighted[i] * weighted[weighted.len() - 1];
+                weighted[i] = w;
+            }
+            weighted
+        });
         let mut lower = Vector::<DimDiff<D, U1>, T>::default();
         for i in 0..lower.len() {
             lower[i] = higher[i] / higher[higher.len() - 1];

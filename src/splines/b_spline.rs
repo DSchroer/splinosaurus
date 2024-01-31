@@ -61,6 +61,6 @@ where
     }
 
     fn at(&self, u: T) -> Vector<D, T> {
-        cox_de_boor(u, self.degree(), self.knots(), &self.control_points)
+        cox_de_boor(u, self.degree(), self.knots(), |i| self.control_points[i].clone())
     }
 }
