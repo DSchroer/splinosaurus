@@ -1,7 +1,7 @@
 use crate::algorithms::cox_de_boor;
 use crate::control_points::ControlPoints;
 use crate::knots::{Knots, KnotsMut};
-use crate::splines::{NURBS, Spline};
+use crate::splines::{Spline, NURBS};
 use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
@@ -61,6 +61,8 @@ where
     }
 
     fn at(&self, u: T) -> Vector<D, T> {
-        cox_de_boor(u, self.degree(), self.knots(), |i| self.control_points[i].clone())
+        cox_de_boor(u, self.degree(), self.knots(), |i| {
+            self.control_points[i].clone()
+        })
     }
 }
