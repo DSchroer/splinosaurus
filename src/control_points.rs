@@ -25,6 +25,14 @@ where
         }
     }
 
+    pub fn new_wrapping(degree: usize, points: Vec<Vector<D, T>>) -> Self {
+        Self {
+            degree,
+            points,
+            wrapping: true,
+        }
+    }
+
     pub fn len(&self) -> usize {
         if !self.wrapping {
             self.points.len()

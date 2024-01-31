@@ -1,16 +1,16 @@
 use nalgebra::Vector3;
 use pixel_canvas::{Canvas, Color, Image, XY};
 use splinosaurus::control_points::ControlPoints;
-use splinosaurus::splines::{BSpline, Spline};
+use splinosaurus::splines::{BSpline, Spline, NURBS};
 
 fn main() {
     let points = ControlPoints::new(
         2,
         vec![
             Vector3::new(100., 100., 1.),
-            Vector3::new(100., 400., 1.),
+            Vector3::new(100., 400., 5.),
             Vector3::new(400., 400., 1.),
-            Vector3::new(400., 100., 1.),
+            Vector3::new(400., 100., 3.),
         ],
     );
     let spline = BSpline::new(points);
@@ -25,6 +25,11 @@ fn main() {
 
         for p in spline.quantize(0.05) {
             drawer.point(p[0] as usize, p[1] as usize, 5, Color::rgb(255, 0, 0));
+        }
+
+        let nurbs = NURBS::new(&spline);
+        for p in nurbs.quantize(0.05) {
+            drawer.point(p[0] as usize, p[1] as usize, 5, Color::rgb(0, 255, 0));
         }
 
         for point in spline.control_points() {

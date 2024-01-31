@@ -1,5 +1,4 @@
 use crate::algorithms::cox_de_boor;
-use crate::control_points::ControlPoints;
 use crate::splines::BSpline;
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
@@ -8,43 +7,23 @@ use nalgebra::{Const, DefaultAllocator, Dim, DimDiff, DimName, DimSub, U1};
 use std::ops::RangeInclusive;
 
 #[derive(Debug)]
-pub struct NURBS<D: Dim, T: Scalar>
+pub struct NURBS<'a, D: Dim, T: Scalar>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub spline: BSpline<D, T>,
+    pub spline: &'a BSpline<D, T>,
 }
 
-impl<D: Dim, T: Scalar> NURBS<D, T>
+impl<'a, D: Dim, T: Scalar> NURBS<'a, D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub fn new(control_points: ControlPoints<D, T>) -> Self {
-        Self {
-            spline: BSpline::new(control_points),
-        }
+    pub fn new(spline: &'a BSpline<D, T>) -> Self {
+        Self { spline }
     }
 }
 
-impl<D: Dim, T: Scalar> AsRef<BSpline<D, T>> for NURBS<D, T>
-where
-    DefaultAllocator: Allocator<T, D>,
-{
-    fn as_ref(&self) -> &BSpline<D, T> {
-        &self.spline
-    }
-}
-
-impl<D: Dim, T: Scalar> AsMut<BSpline<D, T>> for NURBS<D, T>
-where
-    DefaultAllocator: Allocator<T, D>,
-{
-    fn as_mut(&mut self) -> &mut BSpline<D, T> {
-        &mut self.spline
-    }
-}
-
-impl<D: Dim + DimSub<U1>, T: Scalar> Spline<DimDiff<D, U1>, T> for NURBS<D, T>
+impl<D: Dim + DimSub<U1>, T: Scalar> Spline<DimDiff<D, U1>, T> for NURBS<'_, D, T>
 where
     <D as DimSub<Const<1>>>::Output: DimName,
     DefaultAllocator: Allocator<T, D>,
