@@ -1,5 +1,5 @@
 use crate::algorithms::cox_de_boor;
-use crate::control_points::ControlPoints;
+use crate::control_vec::ControlVec;
 use crate::knots::{Knots, KnotsMut};
 use crate::splines::{Spline, NURBS};
 use crate::types::{Scalar, Vector};
@@ -12,7 +12,7 @@ pub struct BSpline<D: Dim, T: Scalar>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    control_points: ControlPoints<D, T>,
+    control_points: ControlVec<D, T>,
     knots: Vec<usize>,
 }
 
@@ -20,7 +20,7 @@ impl<D: Dim, T: Scalar> BSpline<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub fn new(control_points: ControlPoints<D, T>) -> Self {
+    pub fn new(control_points: ControlVec<D, T>) -> Self {
         Self {
             knots: Knots::generate(control_points.degree(), control_points.len()),
             control_points,

@@ -1,10 +1,10 @@
 use nalgebra::Vector3;
 use pixel_canvas::{Canvas, Color, Image, XY};
-use splinosaurus::control_points::ControlPoints;
+use splinosaurus::control_vec::ControlVec;
 use splinosaurus::splines::{BSpline, Spline};
 
 fn main() {
-    let points = ControlPoints::new(
+    let points = ControlVec::new(
         2,
         vec![
             Vector3::new(100., 100., 1.),

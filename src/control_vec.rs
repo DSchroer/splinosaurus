@@ -4,7 +4,7 @@ use nalgebra::{DefaultAllocator, Dim};
 use std::ops::Index;
 
 #[derive(Debug, Clone)]
-pub struct ControlPoints<D: Dim, T: Scalar>
+pub struct ControlVec<D: Dim, T: Scalar>
 where
     DefaultAllocator: Allocator<T, D>,
 {
@@ -13,7 +13,7 @@ where
     wrapping: bool,
 }
 
-impl<D: Dim, T: Scalar> ControlPoints<D, T>
+impl<D: Dim, T: Scalar> ControlVec<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
@@ -66,7 +66,7 @@ where
     }
 }
 
-impl<D: Dim, T: Scalar> Index<usize> for ControlPoints<D, T>
+impl<D: Dim, T: Scalar> Index<usize> for ControlVec<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
