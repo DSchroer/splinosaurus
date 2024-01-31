@@ -35,6 +35,10 @@ where
         Knots::new(self.control_points.degree(), &mut self.knots)
     }
 
+    pub fn control_vec(&self) -> &ControlVec<D, T> {
+        &self.control_points
+    }
+
     pub fn control_points(&self) -> &[Vector<D, T>] {
         self.control_points.points()
     }

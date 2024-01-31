@@ -4,7 +4,7 @@ use splinosaurus::control_points::ControlVec;
 use splinosaurus::splines::{BSpline, Spline};
 
 fn main() {
-    let points = ControlVec::new(
+    let points = ControlVec::new_wrapping(
         2,
         vec![
             Vector3::new(100., 100., 1.),
@@ -16,6 +16,8 @@ fn main() {
     let spline = BSpline::new(points);
 
     println!("rendering {:?}", spline);
+    println!("k {:?}", spline.knots());
+
     let canvas = Canvas::new(512, 512).title("Tile");
 
     // The canvas will render for you at up to 60fps.

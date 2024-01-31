@@ -36,7 +36,7 @@ where
 
     fn at(&self, u: T) -> Vector<DimDiff<D, U1>, T> {
         let higher = cox_de_boor(u, self.spline.degree(), self.spline.knots(), |i| {
-            let mut weighted = self.spline.control_points()[i].clone();
+            let mut weighted = self.spline.control_vec()[i].clone();
             for i in 0..weighted.len() - 1 {
                 let w = weighted[i] * weighted[weighted.len() - 1];
                 weighted[i] = w;
