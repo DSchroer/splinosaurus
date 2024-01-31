@@ -1,9 +1,10 @@
 use nalgebra::Vector3;
 use pixel_canvas::{Canvas, Color, Image, XY};
+use splinosaurus::control_points::ControlPoints;
 use splinosaurus::splines::{BSpline, Spline};
 
 fn main() {
-    let mut spline = BSpline::new(
+    let points = ControlPoints::new(
         2,
         vec![
             Vector3::new(100., 100., 1.),
@@ -12,8 +13,7 @@ fn main() {
             Vector3::new(400., 100., 1.),
         ],
     );
-
-    spline.knots_mut().clamp_ends();
+    let spline = BSpline::new(points);
 
     println!("rendering {:?}", spline);
     let canvas = Canvas::new(512, 512).title("Tile");

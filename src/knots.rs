@@ -1,17 +1,23 @@
 use std::fmt::Debug;
+use std::marker::PhantomData;
 use std::ops::{Index, RangeInclusive};
 
 #[derive(Debug, Clone)]
 pub struct Knots<'a, T = &'a [usize]> {
-    degree: &'a usize,
+    degree: usize,
     knot_vec: T,
+    _phantom: PhantomData<&'a ()>,
 }
 
 pub type KnotsMut<'a> = Knots<'a, &'a mut [usize]>;
 
 impl<'a, T> Knots<'a, T> {
-    pub fn new(degree: &'a usize, knot_vec: T) -> Self {
-        Self { degree, knot_vec }
+    pub fn new(degree: usize, knot_vec: T) -> Self {
+        Self {
+            degree,
+            knot_vec,
+            _phantom: Default::default(),
+        }
     }
 }
 
@@ -24,10 +30,10 @@ impl Knots<'_> {
 impl KnotsMut<'_> {
     pub fn clamp_ends(&mut self) {
         let range = self.range();
-        for i in 0..*self.degree {
+        for i in 0..self.degree {
             self.knot_vec[i] = *range.start();
         }
-        for i in 0..*self.degree {
+        for i in 0..self.degree {
             self.knot_vec[self.knot_vec.len() - i - 1] = *range.end();
         }
     }
@@ -37,7 +43,7 @@ macro_rules! impl_knots {
     ($t:ty) => {
         impl<'a> Knots<'a, $t> {
             pub fn range(&self) -> RangeInclusive<usize> {
-                self.knot_vec[*self.degree]..=self.knot_vec[self.knot_vec.len() - *self.degree - 1]
+                self.knot_vec[self.degree]..=self.knot_vec[self.knot_vec.len() - self.degree - 1]
             }
 
             pub fn find_span(&self, u: usize) -> usize {

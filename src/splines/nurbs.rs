@@ -1,4 +1,5 @@
 use crate::algorithms::cox_de_boor;
+use crate::control_points::ControlPoints;
 use crate::splines::BSpline;
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
@@ -14,12 +15,32 @@ where
     pub spline: BSpline<D, T>,
 }
 
-impl<D: Dim, T: Scalar> From<BSpline<D, T>> for NURBS<D, T>
+impl<D: Dim, T: Scalar> NURBS<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    fn from(spline: BSpline<D, T>) -> Self {
-        Self { spline }
+    pub fn new(control_points: ControlPoints<D, T>) -> Self {
+        Self {
+            spline: BSpline::new(control_points),
+        }
+    }
+}
+
+impl<D: Dim, T: Scalar> AsRef<BSpline<D, T>> for NURBS<D, T>
+where
+    DefaultAllocator: Allocator<T, D>,
+{
+    fn as_ref(&self) -> &BSpline<D, T> {
+        &self.spline
+    }
+}
+
+impl<D: Dim, T: Scalar> AsMut<BSpline<D, T>> for NURBS<D, T>
+where
+    DefaultAllocator: Allocator<T, D>,
+{
+    fn as_mut(&mut self) -> &mut BSpline<D, T> {
+        &mut self.spline
     }
 }
 
