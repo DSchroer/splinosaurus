@@ -16,7 +16,7 @@ where
 
     let k = knots.find_span(u.cast());
 
-    let mut d = Vec::with_capacity(degree + 1); // homogeneous points
+    let mut d = Vec::with_capacity(degree + 1); // homogeneous control_points
     for j in 0..degree + 1 {
         let i = j + k - degree;
         d.push(control_points(i));

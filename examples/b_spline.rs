@@ -1,6 +1,6 @@
 use nalgebra::Vector3;
 use pixel_canvas::{Canvas, Color, Image, XY};
-use splinosaurus::control_vec::ControlVec;
+use splinosaurus::control_points::ControlVec;
 use splinosaurus::splines::{BSpline, Spline};
 
 fn main() {

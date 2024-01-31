@@ -1,5 +1,5 @@
 use crate::algorithms::cox_de_boor;
-use crate::control_vec::ControlVec;
+use crate::control_points::ControlVec;
 use crate::knots::{Knots, KnotsMut};
 use crate::splines::{Spline, NURBS};
 use crate::types::{Scalar, Vector};
