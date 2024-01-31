@@ -1,6 +1,6 @@
 use crate::algorithms::cox_de_boor;
 use crate::control_points::ControlPoints;
-use crate::knots::Knots;
+use crate::knots::{Knots, KnotsMut};
 use crate::splines::{NURBS, Spline};
 use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;
@@ -31,7 +31,7 @@ where
         Knots::new(self.control_points.degree(), &self.knots)
     }
 
-    pub fn knots_mut(&mut self) -> Knots<&mut [usize]> {
+    pub fn knots_mut(&mut self) -> KnotsMut {
         Knots::new(self.control_points.degree(), &mut self.knots)
     }
 
