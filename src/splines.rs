@@ -4,6 +4,7 @@ mod nurbs;
 use crate::types::{Scalar, Vector};
 use nalgebra::{DefaultAllocator, Dim};
 use std::marker::PhantomData;
+use std::ops::RangeInclusive;
 
 pub use b_spline::BSpline;
 pub use nurbs::NURBS;
@@ -12,15 +13,14 @@ pub trait Spline<D: Dim, T: Scalar + 'static>: Sized
 where
     DefaultAllocator: nalgebra::allocator::Allocator<T, D>,
 {
-    fn min_u(&self) -> usize;
-    fn max_u(&self) -> usize;
+    fn range(&self) -> RangeInclusive<usize>;
     fn at(&self, u: T) -> Vector<D, T>;
 
     fn quantize(&self, step: T) -> SplineQuantize<D, T, Self> {
         SplineQuantize {
             spline: self,
             step,
-            position: T::cast_from(self.min_u()),
+            position: T::cast_from(*self.range().start()),
             _dim: Default::default(),
         }
     }
@@ -46,11 +46,11 @@ where
         let position = self.position;
         self.position += self.step;
 
-        if position < T::cast_from(self.spline.max_u())
-            && self.position >= T::cast_from(self.spline.max_u())
+        if position < T::cast_from(*self.spline.range().end())
+            && self.position >= T::cast_from(*self.spline.range().end())
         {
-            Some(self.spline.at(T::cast_from(self.spline.max_u())))
-        } else if position < T::cast_from(self.spline.max_u()) {
+            Some(self.spline.at(T::cast_from(*self.spline.range().end())))
+        } else if position < T::cast_from(*self.spline.range().end()) {
             Some(self.spline.at(position))
         } else {
             None

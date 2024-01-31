@@ -1,115 +1,61 @@
-use std::fmt::{Debug, Formatter};
+use std::fmt::Debug;
+use std::ops::{Index, RangeInclusive};
 
-pub trait Knots {
-    fn len(&self) -> usize;
-    fn min_u(&self) -> usize;
-    fn max_u(&self) -> usize;
-    fn find_span(&self, u: usize) -> usize;
-    fn knot(&self, index: usize) -> usize;
+#[derive(Debug, Clone)]
+pub struct Knots<'a, T = &'a [usize]> {
+    degree: &'a usize,
+    knot_vec: T,
 }
 
-fn knots_to_vec(k: &impl Knots) -> Vec<usize> {
-    Vec::from_iter((0..k.len()).map(|u| k.knot(u)))
-}
+pub type KnotsMut<'a> = Knots<'a, &'a mut [usize]>;
 
-fn debug_knot(k: &impl Knots, f: &mut Formatter<'_>) -> std::fmt::Result {
-    f.debug_struct("UniformClamped")
-        .field("min_u", &k.min_u())
-        .field("max_u", &k.max_u())
-        .field("knots", &knots_to_vec(k))
-        .finish()
-}
-
-#[derive(Clone)]
-pub struct Uniform {
-    degree: usize,
-    points: usize,
-}
-
-impl Uniform {
-    pub fn new(degree: usize, points: usize) -> Self {
-        Self { degree, points }
+impl<'a, T> Knots<'a, T> {
+    pub fn new(degree: &'a usize, knot_vec: T) -> Self {
+        Self { degree, knot_vec }
     }
 }
 
-impl Debug for Uniform {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        debug_knot(self, f)
+impl Knots<'_> {
+    pub fn generate(degree: usize, num_points: usize) -> Vec<usize> {
+        Vec::from_iter(0..degree + num_points + 1)
     }
 }
 
-impl Knots for Uniform {
-    fn len(&self) -> usize {
-        self.points + self.degree + 1
-    }
-
-    fn min_u(&self) -> usize {
-        self.degree
-    }
-
-    fn max_u(&self) -> usize {
-        self.points
-    }
-
-    fn find_span(&self, u: usize) -> usize {
-        if u == self.max_u() {
-            u - 1
-        } else {
-            u
+impl KnotsMut<'_> {
+    pub fn clamp_ends(&mut self) {
+        let range = self.range();
+        for i in 0..*self.degree {
+            self.knot_vec[i] = *range.start();
         }
-    }
-
-    fn knot(&self, index: usize) -> usize {
-        index
-    }
-}
-
-#[derive(Clone)]
-pub struct Clamped {
-    degree: usize,
-    points: usize,
-}
-
-impl Clamped {
-    pub fn new(degree: usize, points: usize) -> Self {
-        Self { degree, points }
-    }
-}
-
-impl Debug for Clamped {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        debug_knot(self, f)
-    }
-}
-
-impl Knots for Clamped {
-    fn len(&self) -> usize {
-        self.points + self.degree + 1
-    }
-
-    fn min_u(&self) -> usize {
-        self.degree
-    }
-
-    fn max_u(&self) -> usize {
-        self.points
-    }
-
-    fn find_span(&self, u: usize) -> usize {
-        if u == self.max_u() {
-            u - 1
-        } else {
-            u
-        }
-    }
-
-    fn knot(&self, index: usize) -> usize {
-        if index < self.degree {
-            self.min_u()
-        } else if index >= self.len() - self.degree {
-            self.max_u()
-        } else {
-            index
+        for i in 0..*self.degree {
+            self.knot_vec[self.knot_vec.len() - i - 1] = *range.end();
         }
     }
 }
+
+macro_rules! impl_knots {
+    ($t:ty) => {
+        impl<'a> Knots<'a, $t> {
+            pub fn range(&self) -> RangeInclusive<usize> {
+                self.knot_vec[*self.degree]..=self.knot_vec[self.knot_vec.len() - *self.degree - 1]
+            }
+
+            pub fn find_span(&self, u: usize) -> usize {
+                let span = self.knot_vec.partition_point(|x| x < &u);
+                let range = self.range();
+                span.clamp(*range.start(), range.end() - 1)
+            }
+        }
+
+        impl<'a> Index<usize> for Knots<'a, $t> {
+            type Output = usize;
+
+            fn index(&self, index: usize) -> &Self::Output {
+                &self.knot_vec[index]
+            }
+        }
+    };
+}
+
+impl_knots!(&'a [usize]);
+impl_knots!(&'a mut [usize]);
