@@ -1,22 +1,22 @@
-use nalgebra::Vector3;
+use nalgebra::Vector2;
 use pixel_canvas::{Canvas, Color, Image, XY};
-use splinosaurus::control_points::ControlVec;
-use splinosaurus::splines::{BSpline, Spline};
+use splinosaurus::control_points::ControlGrid;
+use splinosaurus::surfaces::{BSurface, Surface};
 
 fn main() {
-    let points = ControlVec::new_wrapping(
+    let points = ControlGrid::new(
+        1,
         2,
         vec![
-            Vector3::new(100., 100., 1.),
-            Vector3::new(100., 400., 5.),
-            Vector3::new(400., 400., 1.),
-            Vector3::new(400., 100., 3.),
+            Vector2::new(100., 100.),
+            Vector2::new(100., 400.),
+            Vector2::new(400., 400.),
+            Vector2::new(400., 100.),
         ],
     );
-    let spline = BSpline::new(points);
+    let surface = BSurface::new(points);
 
-    println!("rendering {:?}", spline);
-    println!("k {:?}", spline.knots());
+    println!("rendering {:?}", surface);
 
     let canvas = Canvas::new(512, 512).title("Tile");
 
@@ -25,15 +25,11 @@ fn main() {
         image.fill(Color::WHITE);
         let mut drawer = Drawer { image };
 
-        for p in spline.quantize(0.05) {
+        for p in surface.quantize(0.05) {
             drawer.point(p[0] as usize, p[1] as usize, 5, Color::rgb(255, 0, 0));
         }
 
-        for p in spline.nurbs().quantize(0.05) {
-            drawer.point(p[0] as usize, p[1] as usize, 5, Color::rgb(0, 255, 0));
-        }
-
-        for point in spline.control_points() {
+        for point in surface.control_points() {
             drawer.point(point.x as usize, point.y as usize, 5, Color::BLACK);
         }
     });

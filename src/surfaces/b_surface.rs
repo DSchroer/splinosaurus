@@ -20,6 +20,14 @@ impl<D: Dim, T: Scalar> BSurface<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
+    pub fn new(control_points: ControlGrid<Vector<D, T>>) -> Self {
+        Self {
+            u_knots: Knots::generate(control_points.degree(), control_points.u_len()),
+            v_knots: Knots::generate(control_points.degree(), control_points.v_len()),
+            control_points,
+        }
+    }
+
     pub fn degree(&self) -> usize {
         self.control_points.degree()
     }
