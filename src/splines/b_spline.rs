@@ -60,8 +60,9 @@ impl<D: Dim, T: Scalar> Spline<D, T> for BSpline<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    fn range(&self) -> RangeInclusive<usize> {
-        self.knots().range()
+    fn range(&self) -> RangeInclusive<T> {
+        let r = self.knots().range();
+        T::cast_from(*r.start())..=T::cast_from(*r.end())
     }
 
     fn at(&self, u: T) -> Vector<D, T> {

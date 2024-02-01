@@ -30,8 +30,8 @@ where
     DefaultAllocator: Allocator<T, <D as DimSub<Const<1>>>::Output>,
     <DefaultAllocator as Allocator<T, <D as DimSub<Const<1>>>::Output>>::Buffer: Default,
 {
-    fn range(&self) -> RangeInclusive<usize> {
-        self.spline.knots().range()
+    fn range(&self) -> RangeInclusive<T> {
+        self.spline.range()
     }
 
     fn at(&self, u: T) -> Vector<DimDiff<D, U1>, T> {

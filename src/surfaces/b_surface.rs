@@ -49,15 +49,17 @@ impl<D: Dim, T: Scalar> Surface<D, T> for BSurface<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    fn u_range(&self) -> RangeInclusive<usize> {
-        self.u_knots().range()
+    fn u_range(&self) -> RangeInclusive<T> {
+        let r = self.u_knots().range();
+        T::cast_from(*r.start())..=T::cast_from(*r.end())
     }
 
-    fn v_range(&self) -> RangeInclusive<usize> {
-        self.v_knots().range()
+    fn v_range(&self) -> RangeInclusive<T> {
+        let r = self.v_knots().range();
+        T::cast_from(*r.start())..=T::cast_from(*r.end())
     }
 
-    fn at(&self, uv: UV<T>) -> Vector<D, T> {
+    fn at(&self, _uv: UV<T>) -> Vector<D, T> {
         todo!()
     }
 }
