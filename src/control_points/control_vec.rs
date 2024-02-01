@@ -1,23 +1,14 @@
-use crate::types::{Scalar, Vector};
-use nalgebra::allocator::Allocator;
-use nalgebra::{DefaultAllocator, Dim};
 use std::ops::Index;
 
 #[derive(Debug, Clone)]
-pub struct ControlVec<D: Dim, T: Scalar>
-where
-    DefaultAllocator: Allocator<T, D>,
-{
+pub struct ControlVec<T> {
     degree: usize,
-    points: Vec<Vector<D, T>>,
+    points: Vec<T>,
     wrapping: bool,
 }
 
-impl<D: Dim, T: Scalar> ControlVec<D, T>
-where
-    DefaultAllocator: Allocator<T, D>,
-{
-    pub fn new(degree: usize, points: Vec<Vector<D, T>>) -> Self {
+impl<T> ControlVec<T> {
+    pub fn new(degree: usize, points: Vec<T>) -> Self {
         Self {
             degree,
             points,
@@ -25,7 +16,7 @@ where
         }
     }
 
-    pub fn new_wrapping(degree: usize, points: Vec<Vector<D, T>>) -> Self {
+    pub fn new_wrapping(degree: usize, points: Vec<T>) -> Self {
         Self {
             degree,
             points,
@@ -49,11 +40,11 @@ where
         self.degree = degree
     }
 
-    pub fn points(&self) -> &[Vector<D, T>] {
+    pub fn points(&self) -> &[T] {
         &self.points
     }
 
-    pub fn points_mut(&mut self) -> &mut [Vector<D, T>] {
+    pub fn points_mut(&mut self) -> &mut [T] {
         &mut self.points
     }
 
@@ -66,17 +57,16 @@ where
     }
 }
 
-impl<D: Dim, T: Scalar> Index<usize> for ControlVec<D, T>
-where
-    DefaultAllocator: Allocator<T, D>,
-{
-    type Output = Vector<D, T>;
+impl<T> Index<usize> for ControlVec<T> {
+    type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
-        if !self.wrapping {
-            assert!(index < self.points.len(), "index out of bounds");
-        }
+        let index = if self.wrapping {
+            index % self.points.len()
+        } else {
+            index
+        };
 
-        &self.points[index % self.points.len()]
+        &self.points[index]
     }
 }

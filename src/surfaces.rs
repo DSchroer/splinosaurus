@@ -6,7 +6,7 @@ use std::ops::RangeInclusive;
 
 pub use b_surface::BSurface;
 
-type UV<T> = (T, T);
+pub type UV<T> = (T, T);
 
 pub trait Surface<D: Dim, T: Scalar + 'static>: Sized
 where

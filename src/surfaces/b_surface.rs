@@ -1,4 +1,5 @@
 use crate::control_points::ControlGrid;
+use crate::knots::Knots;
 use crate::surfaces::{Surface, UV};
 use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;
@@ -10,9 +11,38 @@ pub struct BSurface<D: Dim, T: Scalar>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    control_points: ControlGrid<D, T>,
+    control_points: ControlGrid<Vector<D, T>>,
     u_knots: Vec<usize>,
     v_knots: Vec<usize>,
+}
+
+impl<D: Dim, T: Scalar> BSurface<D, T>
+where
+    DefaultAllocator: Allocator<T, D>,
+{
+    pub fn degree(&self) -> usize {
+        self.control_points.degree()
+    }
+
+    pub fn u_knots(&self) -> Knots {
+        Knots::new(self.degree(), &self.u_knots)
+    }
+
+    pub fn v_knots(&self) -> Knots {
+        Knots::new(self.degree(), &self.v_knots)
+    }
+
+    pub fn control_grid(&self) -> &ControlGrid<Vector<D, T>> {
+        &self.control_points
+    }
+
+    pub fn control_points(&self) -> &[Vector<D, T>] {
+        self.control_points.points()
+    }
+
+    pub fn control_points_mut(&mut self) -> &mut [Vector<D, T>] {
+        self.control_points.points_mut()
+    }
 }
 
 impl<D: Dim, T: Scalar> Surface<D, T> for BSurface<D, T>
@@ -20,11 +50,11 @@ where
     DefaultAllocator: Allocator<T, D>,
 {
     fn u_range(&self) -> RangeInclusive<usize> {
-        todo!()
+        self.u_knots().range()
     }
 
     fn v_range(&self) -> RangeInclusive<usize> {
-        todo!()
+        self.v_knots().range()
     }
 
     fn at(&self, uv: UV<T>) -> Vector<D, T> {

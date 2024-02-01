@@ -12,7 +12,7 @@ pub struct BSpline<D: Dim, T: Scalar>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    control_points: ControlVec<D, T>,
+    control_points: ControlVec<Vector<D, T>>,
     knots: Vec<usize>,
 }
 
@@ -20,7 +20,7 @@ impl<D: Dim, T: Scalar> BSpline<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub fn new(control_points: ControlVec<D, T>) -> Self {
+    pub fn new(control_points: ControlVec<Vector<D, T>>) -> Self {
         Self {
             knots: Knots::generate(control_points.degree(), control_points.len()),
             control_points,
@@ -35,7 +35,7 @@ where
         Knots::new(self.control_points.degree(), &mut self.knots)
     }
 
-    pub fn control_vec(&self) -> &ControlVec<D, T> {
+    pub fn control_vec(&self) -> &ControlVec<Vector<D, T>> {
         &self.control_points
     }
 
