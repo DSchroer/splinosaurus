@@ -1,4 +1,4 @@
-use crate::control_points::grid::Grid;
+use crate::grid::Grid;
 use crate::surfaces::UV;
 use std::ops::Index;
 

@@ -1,4 +1,5 @@
 mod b_surface;
+mod t_spline;
 
 use crate::types::{Scalar, Vector};
 use nalgebra::{DefaultAllocator, Dim};
