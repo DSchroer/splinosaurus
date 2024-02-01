@@ -16,7 +16,11 @@ where
     fn range(&self) -> RangeInclusive<T>;
     fn at(&self, u: T) -> Vector<D, T>;
 
+    fn quantize_range(&self, step: T) -> impl Iterator<Item = T> {
+        StepIter::new(step, self.range())
+    }
+
     fn quantize(&self, step: T) -> impl Iterator<Item = Vector<D, T>> {
-        StepIter::new(step, self.range()).map(|i| self.at(i))
+        self.quantize_range(step).map(|i| self.at(i))
     }
 }
