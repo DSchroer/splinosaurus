@@ -61,7 +61,6 @@ where
     for r in 1..degree + 1 {
         for j in (r..degree + 1).rev() {
             let alpha = alpha(v, v_k, degree, r, j, &v_knots);
-
             d[(degree, j)] = &d[(degree, j - 1)] * (T::one() - alpha) + &d[(degree, j)] * alpha;
         }
     }
