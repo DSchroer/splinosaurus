@@ -1,32 +1,48 @@
-use nalgebra::Vector2;
+use nalgebra::{Vector2, Vector3};
 use pixel_canvas::{Canvas, Color, Image, XY};
 use splinosaurus::control_points::{ControlGrid, ControlVec};
+use splinosaurus::export::Triangulation;
 use splinosaurus::splines::{BSpline, Spline};
 use splinosaurus::surfaces::{BSurface, Surface};
+use std::fs::File;
 
 fn main() {
-    let mut surface = BSurface::new(ControlGrid::new(
+    let mut grid = ControlGrid::new(
         2,
         3,
         vec![
             //
-            Vector2::new(100., 100.),
-            Vector2::new(200., 100.),
-            Vector2::new(300., 100.),
+            Vector3::new(100., 100., 100.),
+            Vector3::new(200., 100., 100.),
+            Vector3::new(300., 100., 100.),
             //
-            Vector2::new(100., 200.),
-            Vector2::new(200., 200.),
-            Vector2::new(300., 200.),
+            Vector3::new(100., 200., 100.),
+            Vector3::new(200., 200., 300.),
+            Vector3::new(300., 200., 100.),
             //
-            Vector2::new(100., 300.),
-            Vector2::new(200., 300.),
-            Vector2::new(300., 500.),
+            Vector3::new(100., 300., 100.),
+            Vector3::new(200., 300., 100.),
+            Vector3::new(300., 500., 100.),
         ],
-    ));
-    // surface.u_knots_mut().clamp_ends();
-    // surface.v_knots_mut().clamp_ends();
+    );
+    grid.set_wrapping(false);
 
+    let mut surface = BSurface::new(grid);
+    surface.u_knots_mut().clamp_ends();
+    surface.v_knots_mut().clamp_ends();
+
+    let t = Triangulation::new(0.01, &surface);
+    println!("{:?}", t);
     println!("rendering {:?}", surface);
+    let mut out = File::create("a.stl").unwrap();
+    stl_io::write_stl(
+        &mut out,
+        t.triangles_with_normals().map(|(t, n)| stl_io::Triangle {
+            normal: stl_io::Vector::new([n.x, n.y, n.z]),
+            vertices: t.map(|v| stl_io::Vertex::new([v.x, v.y, v.z])),
+        }),
+    )
+    .unwrap();
 
     let canvas = Canvas::new(512, 512).title("Tile");
 

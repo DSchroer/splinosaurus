@@ -18,15 +18,15 @@ where
     fn v_range(&self) -> RangeInclusive<T>;
     fn at(&self, uv: UV<T>) -> Vector<D, T>;
 
-    fn quantize_u_range(&self, step: T) -> impl ExactSizeIterator<Item = T> {
+    fn quantize_u_range(&self, step: T) -> impl ExactSizeIterator<Item = T> + Clone {
         StepIter::new(step, self.u_range())
     }
 
-    fn quantize_v_range(&self, step: T) -> impl ExactSizeIterator<Item = T> {
+    fn quantize_v_range(&self, step: T) -> impl ExactSizeIterator<Item = T> + Clone {
         StepIter::new(step, self.v_range())
     }
 
-    fn quantize_range(&self, step: T) -> impl ExactSizeIterator<Item = UV<T>> {
+    fn quantize_range(&self, step: T) -> impl ExactSizeIterator<Item = UV<T>> + Clone {
         UVRange {
             u: StepIter::new(step, self.u_range()),
             v: StepIter::new(step, self.v_range()),
@@ -35,11 +35,12 @@ where
         }
     }
 
-    fn quantize(&self, step: T) -> impl ExactSizeIterator<Item = Vector<D, T>> {
+    fn quantize(&self, step: T) -> impl ExactSizeIterator<Item = Vector<D, T>> + Clone {
         self.quantize_range(step).map(|uv| self.at(uv))
     }
 }
 
+#[derive(Debug, Clone)]
 struct UVRange<T> {
     u: StepIter<T>,
     v: StepIter<T>,

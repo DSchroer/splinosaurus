@@ -1,6 +1,6 @@
 use crate::grid::Grid;
 use crate::surfaces::Surface;
-use crate::types::Scalar;
+use crate::types::{Scalar, Vector};
 use nalgebra::{Const, Vector3};
 
 type IndexedTriangle = [usize; 3];
@@ -14,13 +14,60 @@ pub struct Triangulation<T> {
 }
 
 impl<T: Scalar> Triangulation<T> {
-    pub fn new(step: T, surface: impl Surface<Const<3>, T>) -> Self {
-        // let grid = Grid::with_capacity();
-        //
-        // let points = Vec::from_iter(surface.quantize(step));
-        // let points_grid = Grid::new(5, points);
+    pub fn new(step: T, surface: &impl Surface<Const<3>, T>) -> Self {
+        let u_steps = surface.quantize_u_range(step);
+        let v_steps = surface.quantize_v_range(step);
 
-        todo!()
+        let mut points = Grid::with_capacity(u_steps.len(), v_steps.len());
+        let mut normals = Vec::new();
+        let mut triangles = Vec::new();
+
+        for (y, v) in v_steps.enumerate() {
+            for (x, u) in u_steps.clone().enumerate() {
+                let uv = (u, v);
+                points.push(surface.at(uv));
+
+                if x > 1 && y > 1 {
+                    let (a, b) = Self::tris_from_square(&mut points, y, x);
+
+                    triangles.push(a);
+                    normals.push(Self::normal_for(&points, a));
+
+                    triangles.push(b);
+                    normals.push(Self::normal_for(&points, b));
+                }
+            }
+        }
+
+        Self {
+            points: points.into(),
+            normals,
+            indexed_triangles: triangles,
+        }
+    }
+
+    fn tris_from_square(
+        points: &mut Grid<Vector<Const<3>, T>>,
+        y: usize,
+        x: usize,
+    ) -> (IndexedTriangle, IndexedTriangle) {
+        // tri layout
+        // a - b
+        // | \ |
+        // c - d
+        let a = points.vec_index((x, y));
+        let b = points.vec_index((x - 1, y));
+        let c = points.vec_index((x, y - 1));
+        let d = points.vec_index((x - 1, y - 1));
+
+        ([a, d, c], [a, b, d])
+    }
+
+    fn normal_for(points: &Grid<Vector<Const<3>, T>>, triangle: IndexedTriangle) -> Vector3<T> {
+        let a = points.at(triangle[1]) - points.at(triangle[0]);
+        let b = points.at(triangle[2]) - points.at(triangle[0]);
+
+        a.cross(&b)
     }
 
     pub fn points(&self) -> &[Vector3<T>] {
@@ -35,13 +82,15 @@ impl<T: Scalar> Triangulation<T> {
         &self.indexed_triangles
     }
 
-    pub fn triangles(&self) -> impl Iterator<Item = Triangle<T>> + '_ {
+    pub fn triangles(&self) -> impl ExactSizeIterator<Item = Triangle<T>> + '_ {
         self.indexed_triangles
             .iter()
             .map(|t| [self.points[t[0]], self.points[t[1]], self.points[t[2]]])
     }
 
-    pub fn triangles_with_normals(&self) -> impl Iterator<Item = (Triangle<T>, Vector3<T>)> + '_ {
+    pub fn triangles_with_normals(
+        &self,
+    ) -> impl ExactSizeIterator<Item = (Triangle<T>, Vector3<T>)> + '_ {
         self.triangles()
             .enumerate()
             .map(|(i, t)| (t, self.normals[i]))

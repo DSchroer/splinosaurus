@@ -12,6 +12,7 @@ pub trait Scalar:
     + Mul<Output = Self>
     + MulAssign
     + Sub<Output = Self>
+    + SubAssign
     + Div<Output = Self>
     + Cast<usize>
     + CastFrom<usize>
@@ -42,6 +43,7 @@ impl<T> Scalar for T where
         + Mul<Output = Self>
         + MulAssign
         + Sub<Output = Self>
+        + SubAssign
         + Div<Output = Self>
         + Cast<usize>
         + CastFrom<usize>

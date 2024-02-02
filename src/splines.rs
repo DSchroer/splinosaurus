@@ -16,11 +16,11 @@ where
     fn range(&self) -> RangeInclusive<T>;
     fn at(&self, u: T) -> Vector<D, T>;
 
-    fn quantize_range(&self, step: T) -> impl ExactSizeIterator<Item = T> {
+    fn quantize_range(&self, step: T) -> impl ExactSizeIterator<Item = T> + Clone {
         StepIter::new(step, self.range())
     }
 
-    fn quantize(&self, step: T) -> impl ExactSizeIterator<Item = Vector<D, T>> {
+    fn quantize(&self, step: T) -> impl ExactSizeIterator<Item = Vector<D, T>> + Clone {
         self.quantize_range(step).map(|i| self.at(i))
     }
 }

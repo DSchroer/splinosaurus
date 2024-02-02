@@ -28,6 +28,10 @@ impl<T> Grid<T> {
         self.values.push(value)
     }
 
+    pub(crate) fn at(&self, index: usize) -> &T {
+        &self.values[index]
+    }
+
     pub fn len(&self) -> usize {
         self.len
     }
@@ -43,6 +47,16 @@ impl<T> Grid<T> {
     pub fn row_mut(&mut self, row: usize) -> &mut [T] {
         &mut self.values[(row * self.len)..(row * self.len) + self.len]
     }
+
+    pub fn vec_index(&self, (col, row): (usize, usize)) -> usize {
+        (row * self.len) + col
+    }
+}
+
+impl<T> Into<Vec<T>> for Grid<T> {
+    fn into(self) -> Vec<T> {
+        self.values
+    }
 }
 
 impl<T> Index<(usize, usize)> for Grid<T> {
@@ -56,7 +70,7 @@ impl<T> Index<(usize, usize)> for Grid<T> {
             self.height()
         );
 
-        &self.values[(row * self.len) + col]
+        &self.values[self.vec_index((col, row))]
     }
 }
 

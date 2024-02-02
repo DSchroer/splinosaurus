@@ -67,6 +67,11 @@ impl<T> ControlGrid<T> {
     pub fn set_v_wrapping(&mut self, v_wrapping: bool) {
         self.v_wrapping = v_wrapping
     }
+
+    pub fn set_wrapping(&mut self, wrapping: bool) {
+        self.set_u_wrapping(wrapping);
+        self.set_v_wrapping(wrapping);
+    }
 }
 
 impl<T> Index<UV<usize>> for ControlGrid<T> {
