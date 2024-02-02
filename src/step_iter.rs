@@ -32,7 +32,13 @@ impl<T: Scalar> Iterator for StepIter<T> {
             None
         }
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.remaining, Some(self.remaining))
+    }
 }
+
+impl<T: Scalar> ExactSizeIterator for StepIter<T> {}
 
 #[cfg(test)]
 mod tests {
@@ -40,7 +46,8 @@ mod tests {
 
     #[test]
     fn it_iters_smoothly() {
-        let step = StepIter::new(0.1, 1.0..=2.0);
+        let step = StepIter::new(0.5, 0.0..=1.0);
+        assert_eq!(3, step.len());
         assert_eq!(vec![0.0, 0.5, 1.0], step.collect::<Vec<_>>())
     }
 }

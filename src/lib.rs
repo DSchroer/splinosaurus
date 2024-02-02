@@ -4,6 +4,7 @@ pub mod splines;
 pub mod surfaces;
 
 mod algorithms;
+mod export;
 mod grid;
 mod step_iter;
 mod types;
