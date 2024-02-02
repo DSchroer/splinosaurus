@@ -1,4 +1,4 @@
-use crate::algorithms::cox_de_boor;
+use crate::algorithms::cox_de_boor_u;
 use crate::control_points::ControlVec;
 use crate::knots::{Knots, KnotsMut};
 use crate::splines::{Spline, NURBS};
@@ -66,7 +66,7 @@ where
     }
 
     fn at(&self, u: T) -> Vector<D, T> {
-        cox_de_boor(u, self.degree(), self.knots(), |i| {
+        cox_de_boor_u(u, self.degree(), &self.knots(), |i| {
             self.control_points[i].clone()
         })
     }

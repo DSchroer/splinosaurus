@@ -7,6 +7,13 @@ pub struct Grid<T> {
 }
 
 impl<T> Grid<T> {
+    pub(crate) fn with_capacity(len: usize, height: usize) -> Self {
+        Self {
+            len,
+            values: Vec::with_capacity(len * height),
+        }
+    }
+
     pub fn new(len: usize, values: Vec<T>) -> Self {
         assert_eq!(
             0,
@@ -17,12 +24,24 @@ impl<T> Grid<T> {
         Self { len, values }
     }
 
+    pub(crate) fn push(&mut self, value: T) {
+        self.values.push(value)
+    }
+
     pub fn len(&self) -> usize {
         self.len
     }
 
     pub fn height(&self) -> usize {
         self.values.len() / self.len
+    }
+
+    pub fn row(&self, row: usize) -> &[T] {
+        &self.values[(row * self.len)..(row * self.len) + self.len]
+    }
+
+    pub fn row_mut(&mut self, row: usize) -> &mut [T] {
+        &mut self.values[(row * self.len)..(row * self.len) + self.len]
     }
 }
 
@@ -63,5 +82,37 @@ impl<T> AsRef<[T]> for Grid<T> {
 impl<T> AsMut<[T]> for Grid<T> {
     fn as_mut(&mut self) -> &mut [T] {
         &mut self.values
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::grid::Grid;
+
+    #[test]
+    fn it_accesses_col_row() {
+        let original = Grid::new(2, vec![1, 2, 3, 4]);
+
+        assert_eq!(1, original[(0, 0)]);
+        assert_eq!(2, original[(1, 0)]);
+        assert_eq!(3, original[(0, 1)]);
+        assert_eq!(4, original[(1, 1)]);
+
+        assert_eq!(&[1, 2], original.row(0));
+        assert_eq!(&[3, 4], original.row(1));
+    }
+
+    #[test]
+    fn it_does_sub_grids() {
+        let original = Grid::new(3, vec![1, 2, 3, 4, 5, 6, 7, 8, 9]);
+
+        let mut d = Grid::with_capacity(2, 2);
+        for y in 0..2 {
+            for x in 0..2 {
+                d.push(original[(x, y)]);
+            }
+        }
+
+        assert_eq!(vec![1, 2, 4, 5], d.values);
     }
 }

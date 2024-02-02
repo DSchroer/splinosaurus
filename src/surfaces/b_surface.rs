@@ -1,5 +1,6 @@
+use crate::algorithms::cox_de_boor_uv;
 use crate::control_points::ControlGrid;
-use crate::knots::Knots;
+use crate::knots::{Knots, KnotsMut};
 use crate::surfaces::{Surface, UV};
 use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;
@@ -36,8 +37,15 @@ where
         Knots::new(self.degree(), &self.u_knots)
     }
 
+    pub fn u_knots_mut(&mut self) -> KnotsMut {
+        KnotsMut::new(self.degree(), &mut self.u_knots)
+    }
+
     pub fn v_knots(&self) -> Knots {
         Knots::new(self.degree(), &self.v_knots)
+    }
+    pub fn v_knots_mut(&mut self) -> KnotsMut {
+        KnotsMut::new(self.degree(), &mut self.v_knots)
     }
 
     pub fn control_grid(&self) -> &ControlGrid<Vector<D, T>> {
@@ -56,6 +64,7 @@ where
 impl<D: Dim, T: Scalar> Surface<D, T> for BSurface<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
+    <DefaultAllocator as Allocator<T, D>>::Buffer: Default,
 {
     fn u_range(&self) -> RangeInclusive<T> {
         let r = self.u_knots().range();
@@ -67,7 +76,34 @@ where
         T::cast_from(*r.start())..=T::cast_from(*r.end())
     }
 
-    fn at(&self, _uv: UV<T>) -> Vector<D, T> {
-        todo!()
+    fn at(&self, uv: UV<T>) -> Vector<D, T> {
+        cox_de_boor_uv(uv, self.degree(), &self.u_knots(), &self.v_knots(), |p| {
+            self.control_points[p].clone()
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use nalgebra::Vector1;
+
+    #[test]
+    fn it_finds_all_corners() {
+        let surface = BSurface::new(ControlGrid::new(
+            1,
+            2,
+            vec![
+                Vector1::new(0.),
+                Vector1::new(1.),
+                Vector1::new(2.),
+                Vector1::new(3.),
+            ],
+        ));
+
+        assert_eq!(0., surface.at((1., 1.)).x);
+        assert_eq!(1., surface.at((2., 1.)).x);
+        assert_eq!(2., surface.at((1., 2.)).x);
+        assert_eq!(3., surface.at((2., 2.)).x);
     }
 }

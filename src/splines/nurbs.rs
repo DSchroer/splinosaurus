@@ -1,4 +1,4 @@
-use crate::algorithms::cox_de_boor;
+use crate::algorithms::cox_de_boor_u;
 use crate::splines::BSpline;
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
@@ -35,7 +35,7 @@ where
     }
 
     fn at(&self, u: T) -> Vector<DimDiff<D, U1>, T> {
-        let higher = cox_de_boor(u, self.spline.degree(), self.spline.knots(), |i| {
+        let higher = cox_de_boor_u(u, self.spline.degree(), &self.spline.knots(), |i| {
             let mut weighted = self.spline.control_vec()[i].clone();
             for i in 0..weighted.len() - 1 {
                 let w = weighted[i] * weighted[weighted.len() - 1];

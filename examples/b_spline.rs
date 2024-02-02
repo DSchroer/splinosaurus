@@ -1,31 +1,40 @@
 use nalgebra::Vector2;
 use pixel_canvas::{Canvas, Color, Image, XY};
-use splinosaurus::control_points::ControlGrid;
+use splinosaurus::control_points::{ControlGrid, ControlVec};
+use splinosaurus::splines::{BSpline, Spline};
 use splinosaurus::surfaces::{BSurface, Surface};
 
 fn main() {
-    let points = ControlGrid::new(
-        1,
+    let mut surface = BSurface::new(ControlGrid::new(
         2,
+        3,
         vec![
+            //
             Vector2::new(100., 100.),
-            Vector2::new(100., 400.),
-            Vector2::new(400., 400.),
-            Vector2::new(400., 100.),
+            Vector2::new(200., 100.),
+            Vector2::new(300., 100.),
+            //
+            Vector2::new(100., 200.),
+            Vector2::new(200., 200.),
+            Vector2::new(300., 200.),
+            //
+            Vector2::new(100., 300.),
+            Vector2::new(200., 300.),
+            Vector2::new(300., 500.),
         ],
-    );
-    let surface = BSurface::new(points);
+    ));
+    // surface.u_knots_mut().clamp_ends();
+    // surface.v_knots_mut().clamp_ends();
 
     println!("rendering {:?}", surface);
 
     let canvas = Canvas::new(512, 512).title("Tile");
 
-    // The canvas will render for you at up to 60fps.
-    canvas.render(move |_, image| {
+    canvas.render_on_change(true).render(move |_, image| {
         image.fill(Color::WHITE);
         let mut drawer = Drawer { image };
 
-        for p in surface.quantize(0.05) {
+        for p in surface.quantize(0.1) {
             drawer.point(p[0] as usize, p[1] as usize, 5, Color::rgb(255, 0, 0));
         }
 
