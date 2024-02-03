@@ -19,11 +19,8 @@ impl<T: Scalar> Triangulation<T> {
         let v_steps = surface.quantize_v_range(step);
 
         let mut points = Grid::with_capacity(u_steps.len(), v_steps.len());
-        let mut triangulation = Self {
-            points: Vec::new(),
-            normals: Vec::new(),
-            indexed_triangles: Vec::new(),
-        };
+        let mut normals = Vec::new();
+        let mut indexed_triangles = Vec::new();
 
         for (y, v) in v_steps.enumerate() {
             for (x, u) in u_steps.clone().enumerate() {
@@ -31,63 +28,36 @@ impl<T: Scalar> Triangulation<T> {
                 points.push(surface.at(uv));
 
                 if x > 0 && y > 0 {
-                    triangulation.add_tris_and_normals(&points, (x, y), (x - 1, y - 1));
+                    let (a, b) = Self::tris_from_square(&points, (x, y));
+
+                    indexed_triangles.push(a);
+                    normals.push(Self::normal_for(&points, a));
+
+                    indexed_triangles.push(b);
+                    normals.push(Self::normal_for(&points, b));
                 }
             }
         }
 
-        if surface.u_wrapping() {
-            for y in 1..points.height() - 1 {
-                triangulation.add_tris_and_normals(&points, (1, y + 1), (0, y));
-            }
+        Self {
+            points: points.into(),
+            normals,
+            indexed_triangles,
         }
-
-        if surface.v_wrapping() {
-            for x in 1..points.len() - 1 {
-                triangulation.add_tris_and_normals(&points, (x + 1, 1), (x, 0));
-            }
-        }
-
-        triangulation.points = points.into();
-        triangulation
-    }
-
-    fn add_tris_and_normals(
-        &mut self,
-        points: &Grid<Vector<Const<3>, T>>,
-        xy1: (usize, usize),
-        xy2: (usize, usize),
-    ) {
-        let (a, b) = Self::tris_from_square(&points, xy1, xy2);
-
-        self.indexed_triangles.push(a);
-        self.normals.push(Self::normal_for(&points, a));
-
-        self.indexed_triangles.push(b);
-        self.normals.push(Self::normal_for(&points, b));
     }
 
     fn tris_from_square(
         points: &Grid<Vector<Const<3>, T>>,
-        (x1, y1): (usize, usize),
-        (x2, y2): (usize, usize),
+        (x, y): (usize, usize),
     ) -> (IndexedTriangle, IndexedTriangle) {
-        fn wrapping_index<T: Scalar>(
-            points: &Grid<Vector<Const<3>, T>>,
-            (x, y): (usize, usize),
-        ) -> usize {
-            let xy = (x, y);
-            points.vec_index(xy)
-        }
-
         // tri layout
         // a - b
         // | \ |
         // c - d
-        let a = wrapping_index(points, (x1, y1));
-        let b = wrapping_index(points, (x2, y1));
-        let c = wrapping_index(points, (x1, y2));
-        let d = wrapping_index(points, (x2, y2));
+        let a = points.vec_index((x, y));
+        let b = points.vec_index((x - 1, y));
+        let c = points.vec_index((x, y - 1));
+        let d = points.vec_index((x - 1, y - 1));
 
         ([a, d, c], [a, b, d])
     }

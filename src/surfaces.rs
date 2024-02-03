@@ -15,10 +15,7 @@ where
     DefaultAllocator: nalgebra::allocator::Allocator<T, D>,
 {
     fn u_range(&self) -> RangeInclusive<T>;
-    fn u_wrapping(&self) -> bool;
-
     fn v_range(&self) -> RangeInclusive<T>;
-    fn v_wrapping(&self) -> bool;
 
     fn at(&self, uv: UV<T>) -> Vector<D, T>;
 

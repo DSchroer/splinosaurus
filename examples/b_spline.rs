@@ -25,6 +25,7 @@ fn main() {
             Vector3::new(300., 500., 100.),
         ],
     );
+    grid.set_u_wrapping(true);
 
     let surface = BSurface::new(grid);
 

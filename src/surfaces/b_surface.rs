@@ -22,11 +22,6 @@ where
     DefaultAllocator: Allocator<T, D>,
 {
     pub fn new(control_points: ControlGrid<Vector<D, T>>) -> Self {
-        assert!(
-            !(control_points.u_wrapping() && control_points.v_wrapping()),
-            "b-surface can not wrap on u and v"
-        );
-
         Self {
             u_knots: Knots::generate(control_points.degree(), control_points.u_len()),
             v_knots: Knots::generate(control_points.degree(), control_points.v_len()),
@@ -76,17 +71,9 @@ where
         T::cast_from(*r.start())..=T::cast_from(*r.end())
     }
 
-    fn u_wrapping(&self) -> bool {
-        self.control_points.u_wrapping()
-    }
-
     fn v_range(&self) -> RangeInclusive<T> {
         let r = self.v_knots().range();
         T::cast_from(*r.start())..=T::cast_from(*r.end())
-    }
-
-    fn v_wrapping(&self) -> bool {
-        self.control_points.v_wrapping()
     }
 
     fn at(&self, uv: UV<T>) -> Vector<D, T> {

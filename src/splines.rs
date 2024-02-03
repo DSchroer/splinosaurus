@@ -14,7 +14,6 @@ where
     DefaultAllocator: nalgebra::allocator::Allocator<T, D>,
 {
     fn range(&self) -> RangeInclusive<T>;
-    fn wrapping(&self) -> bool;
     fn at(&self, u: T) -> Vector<D, T>;
 
     fn quantize_range(&self, step: T) -> impl ExactSizeIterator<Item = T> + Clone {
