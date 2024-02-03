@@ -25,15 +25,11 @@ fn main() {
             Vector3::new(300., 500., 100.),
         ],
     );
-    grid.set_wrapping(false);
 
-    let mut surface = BSurface::new(grid);
-    surface.u_knots_mut().clamp_ends();
-    surface.v_knots_mut().clamp_ends();
+    let surface = BSurface::new(grid);
 
-    let t = Triangulation::new(0.01, &surface);
-    println!("{:?}", t);
-    println!("rendering {:?}", surface);
+    let t = Triangulation::new(0.1, &surface);
+
     let mut out = File::create("a.stl").unwrap();
     stl_io::write_stl(
         &mut out,

@@ -34,6 +34,10 @@ where
         self.spline.range()
     }
 
+    fn wrapping(&self) -> bool {
+        self.spline.wrapping()
+    }
+
     fn at(&self, u: T) -> Vector<DimDiff<D, U1>, T> {
         let higher = cox_de_boor_u(u, self.spline.degree(), &self.spline.knots(), |i| {
             let mut weighted = self.spline.control_vec()[i].clone();

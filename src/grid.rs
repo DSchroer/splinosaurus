@@ -64,7 +64,7 @@ impl<T> Index<(usize, usize)> for Grid<T> {
 
     fn index(&self, (col, row): (usize, usize)) -> &Self::Output {
         assert!(
-            col < self.len() || row < self.height(),
+            col < self.len() && row < self.height(),
             "uv index out of bounds ({col},{row}) out of ({},{})",
             self.len(),
             self.height()
@@ -77,13 +77,14 @@ impl<T> Index<(usize, usize)> for Grid<T> {
 impl<T> IndexMut<(usize, usize)> for Grid<T> {
     fn index_mut(&mut self, (col, row): (usize, usize)) -> &mut Self::Output {
         assert!(
-            col < self.len() || row < self.height(),
+            col < self.len() && row < self.height(),
             "uv index out of bounds ({col},{row}) out of ({},{})",
             self.len(),
             self.height()
         );
 
-        &mut self.values[(row * self.len) + col]
+        let index = self.vec_index((col, row));
+        &mut self.values[index]
     }
 }
 

@@ -67,19 +67,22 @@ impl<T> ControlGrid<T> {
     pub fn set_v_wrapping(&mut self, v_wrapping: bool) {
         self.v_wrapping = v_wrapping
     }
-
-    pub fn set_wrapping(&mut self, wrapping: bool) {
-        self.set_u_wrapping(wrapping);
-        self.set_v_wrapping(wrapping);
-    }
 }
 
 impl<T> Index<UV<usize>> for ControlGrid<T> {
     type Output = T;
 
     fn index(&self, (u, v): UV<usize>) -> &Self::Output {
-        let u = if self.u_wrapping { u % self.u_len() } else { u };
-        let v = if self.v_wrapping { v % self.v_len() } else { v };
+        let u = if self.u_wrapping {
+            u % self.points.len()
+        } else {
+            u
+        };
+        let v = if self.v_wrapping {
+            v % self.points.height()
+        } else {
+            v
+        };
 
         &self.points[(u, v)]
     }
@@ -115,5 +118,30 @@ mod tests {
         assert_eq!(Vector1::new(1), cg[(1, 0)]);
         assert_eq!(Vector1::new(2), cg[(0, 1)]);
         assert_eq!(Vector1::new(3), cg[(1, 1)]);
+    }
+
+    #[test]
+    pub fn it_wraps() {
+        let mut cg = ControlGrid::new(
+            0,
+            2,
+            vec![
+                //
+                Vector1::new(0),
+                Vector1::new(1),
+                //
+                Vector1::new(2),
+                Vector1::new(3),
+            ],
+        );
+        cg.set_wrapping(true);
+
+        assert_eq!(Vector1::new(0), cg[(2, 0)]);
+        assert_eq!(Vector1::new(0), cg[(0, 2)]);
+        assert_eq!(Vector1::new(0), cg[(2, 2)]);
+
+        assert_eq!(Vector1::new(1), cg[(3, 0)]);
+        assert_eq!(Vector1::new(2), cg[(0, 3)]);
+        assert_eq!(Vector1::new(3), cg[(3, 3)]);
     }
 }

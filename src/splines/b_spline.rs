@@ -65,6 +65,10 @@ where
         T::cast_from(*r.start())..=T::cast_from(*r.end())
     }
 
+    fn wrapping(&self) -> bool {
+        self.control_points.wrapping()
+    }
+
     fn at(&self, u: T) -> Vector<D, T> {
         cox_de_boor_u(u, self.degree(), &self.knots(), |i| {
             self.control_points[i].clone()
