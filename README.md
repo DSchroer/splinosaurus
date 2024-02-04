@@ -1,5 +1,8 @@
 # Splinosaurus
 
+![GitHub License](https://img.shields.io/github/license/DSchroer/splinosaurus)
+[![Crates.io](https://img.shields.io/crates/v/splinosaurus.svg)](https://crates.io/crates/splinosaurus)
+
 A highly flexible spline and surface library.
 
 Features include:
