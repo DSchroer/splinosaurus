@@ -7,7 +7,7 @@ use std::ops::RangeInclusive;
 
 use crate::step_iter::StepIter;
 pub use b_spline::BSpline;
-pub use nurbs::NURBS;
+pub use nurbs::NURBSpline;
 
 /// A single dimensional spline.
 pub trait Spline<D: Dim, T: Scalar + 'static>: Sized

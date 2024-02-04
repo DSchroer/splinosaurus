@@ -6,9 +6,9 @@ Features include:
 - BSpline
 - NURBS (spline)
 - BSurface
+- NURBS (surface)
 
 Planned:
-- NURBS (surface)
 - TSpline
 
 The goals of this library are to:

@@ -8,14 +8,14 @@ use std::ops::RangeInclusive;
 
 /// NURBS (spline). Representing a weighted BSpline.
 #[derive(Debug)]
-pub struct NURBS<'a, D: Dim, T: Scalar>
+pub struct NURBSpline<'a, D: Dim, T: Scalar>
 where
     DefaultAllocator: Allocator<T, D>,
 {
     spline: &'a BSpline<D, T>,
 }
 
-impl<'a, D: Dim, T: Scalar> NURBS<'a, D, T>
+impl<'a, D: Dim, T: Scalar> NURBSpline<'a, D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
@@ -24,7 +24,7 @@ where
     }
 }
 
-impl<D: Dim + DimSub<U1>, T: Scalar> Spline<DimDiff<D, U1>, T> for NURBS<'_, D, T>
+impl<D: Dim + DimSub<U1>, T: Scalar> Spline<DimDiff<D, U1>, T> for NURBSpline<'_, D, T>
 where
     <D as DimSub<Const<1>>>::Output: DimName,
     DefaultAllocator: Allocator<T, D>,

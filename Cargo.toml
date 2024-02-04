@@ -1,12 +1,11 @@
 [package]
 name = "splinosaurus"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+repository = "https://github.com/DSchroer/splinosaurus/"
 description = "flexible spline and surface library"
 license = "GPL-3.0"
-license-file = "LICENSE"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+categories = ["mathematics", "science"]
 
 [dependencies]
 nalgebra = "0.32"

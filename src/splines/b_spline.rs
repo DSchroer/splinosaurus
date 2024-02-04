@@ -1,7 +1,7 @@
 use crate::algorithms::cox_de_boor_u;
 use crate::control_points::ControlVec;
 use crate::knots::{Knots, KnotsMut};
-use crate::splines::{Spline, NURBS};
+use crate::splines::{NURBSpline, Spline};
 use crate::types::{Scalar, Vector};
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
@@ -62,8 +62,8 @@ where
 
     /// Convert an N degree BSpline into a N-1 degree NURBS.
     /// The final degree becomes the weight value.
-    pub fn nurbs(&self) -> NURBS<D, T> {
-        NURBS::new(self)
+    pub fn nurbs(&self) -> NURBSpline<D, T> {
+        NURBSpline::new(self)
     }
 }
 
