@@ -22,4 +22,4 @@ The goals of this library are to:
 
 ### No STD
 
-This crate works under no_std but does requite `alloc` for vectors. 
+This crate works under no_std but does require `alloc` for vectors. 
