@@ -1,6 +1,7 @@
-use std::fmt::Debug;
-use std::marker::PhantomData;
-use std::ops::{Index, RangeInclusive};
+use alloc::vec::Vec;
+use core::fmt::Debug;
+use core::marker::PhantomData;
+use core::ops::{Index, RangeInclusive};
 
 /// A knot vector.
 #[derive(Debug, Clone)]

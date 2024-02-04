@@ -1,5 +1,5 @@
 use crate::types::Scalar;
-use std::ops::RangeInclusive;
+use core::ops::RangeInclusive;
 
 #[derive(Debug, Clone)]
 pub struct StepIter<T> {
@@ -43,6 +43,8 @@ impl<T: Scalar> ExactSizeIterator for StepIter<T> {}
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
+    use alloc::vec::Vec;
 
     #[test]
     fn it_iters_smoothly() {

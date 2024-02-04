@@ -1,7 +1,7 @@
 use az::{Cast, CastFrom};
+use core::fmt::Debug;
+use core::ops::*;
 use nalgebra::DefaultAllocator;
-use std::fmt::Debug;
-use std::ops::*;
 
 pub trait Scalar:
     Copy

@@ -1,4 +1,5 @@
 #![deny(missing_docs)]
+#![no_std]
 
 //! A highly flexible spline and surface library.
 //!
@@ -16,6 +17,8 @@
 //! - Expose both high and low level manipulation APIs
 //! - Allow for type flexibility (fixed or floating point)
 //! - Minimal dependencies
+
+extern crate alloc;
 
 /// Defining and manipulating control points.
 pub mod control_points;

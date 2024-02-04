@@ -3,9 +3,10 @@ use crate::control_points::ControlGrid;
 use crate::knots::{Knots, KnotsMut};
 use crate::surfaces::{NURBSurface, Surface, UV};
 use crate::types::{Scalar, Vector};
+use alloc::vec::Vec;
+use core::ops::RangeInclusive;
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
-use std::ops::RangeInclusive;
 
 /// Basis spline of two degrees.
 /// https://en.wikipedia.org/wiki/B-spline
@@ -102,6 +103,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
     use nalgebra::Vector1;
 
     #[test]

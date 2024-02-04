@@ -2,6 +2,7 @@ use crate::grid::Grid;
 use crate::knots::Knots;
 use crate::surfaces::UV;
 use crate::types::{Scalar, Vector};
+use alloc::vec::Vec;
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
 

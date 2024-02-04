@@ -3,9 +3,10 @@ use crate::control_points::ControlVec;
 use crate::knots::{Knots, KnotsMut};
 use crate::splines::{NURBSpline, Spline};
 use crate::types::{Scalar, Vector};
+use alloc::vec::Vec;
+use core::ops::RangeInclusive;
 use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
-use std::ops::RangeInclusive;
 
 /// Basis spline of a single degree.
 /// https://en.wikipedia.org/wiki/B-spline

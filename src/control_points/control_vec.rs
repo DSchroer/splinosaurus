@@ -1,4 +1,5 @@
-use std::ops::Index;
+use alloc::vec::Vec;
+use core::ops::Index;
 
 /// 1D list of control points.
 #[derive(Debug, Clone)]

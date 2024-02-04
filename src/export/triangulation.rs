@@ -1,6 +1,7 @@
 use crate::grid::Grid;
 use crate::surfaces::Surface;
 use crate::types::{Scalar, Vector};
+use alloc::vec::Vec;
 use nalgebra::{Const, Vector3};
 
 type IndexedTriangle = [usize; 3];

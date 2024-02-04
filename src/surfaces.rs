@@ -2,8 +2,8 @@ mod b_surface;
 mod nurbs;
 
 use crate::types::{Scalar, Vector};
+use core::ops::RangeInclusive;
 use nalgebra::{DefaultAllocator, Dim};
-use std::ops::RangeInclusive;
 
 use crate::step_iter::StepIter;
 pub use b_surface::BSurface;

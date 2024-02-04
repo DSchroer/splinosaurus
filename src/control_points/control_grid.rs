@@ -1,6 +1,7 @@
 use crate::grid::Grid;
 use crate::surfaces::UV;
-use std::ops::Index;
+use alloc::vec::Vec;
+use core::ops::Index;
 
 /// 2D grid of control points.
 #[derive(Debug, Clone)]
@@ -103,6 +104,7 @@ impl<T> Index<UV<usize>> for ControlGrid<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
     use nalgebra::Vector1;
 
     #[test]

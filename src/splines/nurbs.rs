@@ -2,9 +2,9 @@ use crate::algorithms::cox_de_boor_u;
 use crate::splines::BSpline;
 use crate::splines::Spline;
 use crate::types::{Scalar, Vector};
+use core::ops::RangeInclusive;
 use nalgebra::allocator::Allocator;
 use nalgebra::{Const, DefaultAllocator, Dim, DimDiff, DimName, DimSub, U1};
-use std::ops::RangeInclusive;
 
 /// NURBS (spline). Representing a weighted BSpline.
 #[derive(Debug)]

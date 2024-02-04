@@ -1,4 +1,5 @@
-use std::ops::{Index, IndexMut};
+use alloc::vec::Vec;
+use core::ops::{Index, IndexMut};
 
 #[derive(Debug, Clone)]
 pub struct Grid<T> {
@@ -99,6 +100,7 @@ impl<T> AsMut<[T]> for Grid<T> {
 #[cfg(test)]
 mod tests {
     use crate::grid::Grid;
+    use alloc::vec;
 
     #[test]
     fn it_accesses_col_row() {

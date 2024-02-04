@@ -1,9 +1,9 @@
 use crate::algorithms::cox_de_boor_uv;
 use crate::surfaces::{BSurface, Surface, UV};
 use crate::types::{Scalar, Vector};
+use core::ops::RangeInclusive;
 use nalgebra::allocator::Allocator;
 use nalgebra::{Const, DefaultAllocator, Dim, DimDiff, DimName, DimSub, U1};
-use std::ops::RangeInclusive;
 
 /// NURBS (surface). Representing a weighted BSurface.
 #[derive(Debug)]

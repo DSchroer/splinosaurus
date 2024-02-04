@@ -1,11 +1,11 @@
 [package]
 name = "splinosaurus"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 repository = "https://github.com/DSchroer/splinosaurus/"
 description = "flexible spline and surface library"
 license = "GPL-3.0"
-categories = ["mathematics", "science"]
+categories = ["mathematics", "science", "no-std"]
 
 [dependencies]
 nalgebra = "0.32"

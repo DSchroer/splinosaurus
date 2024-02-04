@@ -19,3 +19,7 @@ The goals of this library are to:
 - Expose both high and low level manipulation APIs
 - Allow for type flexibility (fixed or floating point)
 - Minimal dependencies
+
+### No STD
+
+This crate works under no_std but does requite `alloc` for vectors. 
