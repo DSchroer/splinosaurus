@@ -1,8 +1,7 @@
-use nalgebra::{Vector2, Vector3};
+use nalgebra::Vector3;
 use pixel_canvas::{Canvas, Color, Image, XY};
-use splinosaurus::control_points::{ControlGrid, ControlVec};
+use splinosaurus::control_points::ControlGrid;
 use splinosaurus::export::Triangulation;
-use splinosaurus::splines::{BSpline, Spline};
 use splinosaurus::surfaces::{BSurface, Surface};
 use std::fs::File;
 

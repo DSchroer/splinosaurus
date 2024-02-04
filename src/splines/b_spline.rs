@@ -7,6 +7,8 @@ use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
 use std::ops::RangeInclusive;
 
+/// Basis spline of a single degree.
+/// https://en.wikipedia.org/wiki/B-spline
 #[derive(Debug, Clone)]
 pub struct BSpline<D: Dim, T: Scalar>
 where
@@ -20,6 +22,7 @@ impl<D: Dim, T: Scalar> BSpline<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
+    /// Create a new basis spline for a list of control points.
     pub fn new(control_points: ControlVec<Vector<D, T>>) -> Self {
         Self {
             knots: Knots::generate(control_points.degree(), control_points.len()),
@@ -27,30 +30,38 @@ where
         }
     }
 
+    /// Access the knots of the spline.
     pub fn knots(&self) -> Knots {
         Knots::new(self.control_points.degree(), &self.knots)
     }
 
+    /// Mutable access to the knots of the spline.
     pub fn knots_mut(&mut self) -> KnotsMut {
         Knots::new(self.control_points.degree(), &mut self.knots)
     }
 
+    /// Access to the control vec.
     pub fn control_vec(&self) -> &ControlVec<Vector<D, T>> {
         &self.control_points
     }
 
+    /// The control points.
     pub fn control_points(&self) -> &[Vector<D, T>] {
         self.control_points.points()
     }
 
+    /// Mutable control points.
     pub fn control_points_mut(&mut self) -> &mut [Vector<D, T>] {
         self.control_points.points_mut()
     }
 
+    /// Degree of the curve.
     pub fn degree(&self) -> usize {
         self.control_points.degree()
     }
 
+    /// Convert an N degree BSpline into a N-1 degree NURBS.
+    /// The final degree becomes the weight value.
     pub fn nurbs(&self) -> NURBS<D, T> {
         NURBS::new(self)
     }

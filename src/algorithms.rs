@@ -60,7 +60,7 @@ where
 
     for r in 1..degree + 1 {
         for j in (r..degree + 1).rev() {
-            let alpha = alpha(v, v_k, degree, r, j, &v_knots);
+            let alpha = alpha(v, v_k, degree, r, j, v_knots);
             d[(degree, j)] = &d[(degree, j - 1)] * (T::one() - alpha) + &d[(degree, j)] * alpha;
         }
     }
@@ -79,7 +79,7 @@ fn cox_de_boor<D: Dim, T: Scalar>(
 {
     for r in 1..degree + 1 {
         for j in (r..degree + 1).rev() {
-            let alpha = alpha(u, k, degree, r, j, &knots);
+            let alpha = alpha(u, k, degree, r, j, knots);
             d[j] = &d[j - 1] * (T::one() - alpha) + &d[j] * alpha;
         }
     }

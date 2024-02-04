@@ -7,6 +7,8 @@ use nalgebra::allocator::Allocator;
 use nalgebra::{DefaultAllocator, Dim};
 use std::ops::RangeInclusive;
 
+/// Basis spline of two degrees.
+/// https://en.wikipedia.org/wiki/B-spline
 #[derive(Debug, Clone)]
 pub struct BSurface<D: Dim, T: Scalar>
 where
@@ -21,6 +23,7 @@ impl<D: Dim, T: Scalar> BSurface<D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
+    /// Create a new BSurface from a grid of control points.
     pub fn new(control_points: ControlGrid<Vector<D, T>>) -> Self {
         Self {
             u_knots: Knots::generate(control_points.degree(), control_points.u_len()),
@@ -29,33 +32,40 @@ where
         }
     }
 
+    /// Degree of the surface.
     pub fn degree(&self) -> usize {
         self.control_points.degree()
     }
 
+    /// u knots.
     pub fn u_knots(&self) -> Knots {
         Knots::new(self.degree(), &self.u_knots)
     }
-
+    /// Mutable u knots.
     pub fn u_knots_mut(&mut self) -> KnotsMut {
         KnotsMut::new(self.degree(), &mut self.u_knots)
     }
 
+    /// v knots.
     pub fn v_knots(&self) -> Knots {
         Knots::new(self.degree(), &self.v_knots)
     }
+    /// Mutable v knots.
     pub fn v_knots_mut(&mut self) -> KnotsMut {
         KnotsMut::new(self.degree(), &mut self.v_knots)
     }
 
+    /// The control grid.
     pub fn control_grid(&self) -> &ControlGrid<Vector<D, T>> {
         &self.control_points
     }
 
+    /// The control points.
     pub fn control_points(&self) -> &[Vector<D, T>] {
         self.control_points.points()
     }
 
+    /// Mutable control points.
     pub fn control_points_mut(&mut self) -> &mut [Vector<D, T>] {
         self.control_points.points_mut()
     }

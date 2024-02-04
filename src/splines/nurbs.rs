@@ -6,19 +6,20 @@ use nalgebra::allocator::Allocator;
 use nalgebra::{Const, DefaultAllocator, Dim, DimDiff, DimName, DimSub, U1};
 use std::ops::RangeInclusive;
 
+/// NURBS (spline). Representing a weighted BSpline.
 #[derive(Debug)]
 pub struct NURBS<'a, D: Dim, T: Scalar>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub spline: &'a BSpline<D, T>,
+    spline: &'a BSpline<D, T>,
 }
 
 impl<'a, D: Dim, T: Scalar> NURBS<'a, D, T>
 where
     DefaultAllocator: Allocator<T, D>,
 {
-    pub fn new(spline: &'a BSpline<D, T>) -> Self {
+    pub(crate) fn new(spline: &'a BSpline<D, T>) -> Self {
         Self { spline }
     }
 }

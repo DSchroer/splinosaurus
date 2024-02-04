@@ -22,16 +22,6 @@ pub trait Scalar:
     fn one() -> Self {
         Self::cast_from(1)
     }
-
-    fn ratio(a: Self, b: Self) -> Self {
-        if a == b {
-            a
-        } else if a < b {
-            a / b
-        } else {
-            b / a
-        }
-    }
 }
 
 impl<T> Scalar for T where

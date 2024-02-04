@@ -40,10 +40,6 @@ impl<T> Grid<T> {
         self.values.len() / self.len
     }
 
-    pub fn row(&self, row: usize) -> &[T] {
-        &self.values[(row * self.len)..(row * self.len) + self.len]
-    }
-
     pub fn row_mut(&mut self, row: usize) -> &mut [T] {
         &mut self.values[(row * self.len)..(row * self.len) + self.len]
     }
@@ -53,9 +49,9 @@ impl<T> Grid<T> {
     }
 }
 
-impl<T> Into<Vec<T>> for Grid<T> {
-    fn into(self) -> Vec<T> {
-        self.values
+impl<T> From<Grid<T>> for Vec<T> {
+    fn from(value: Grid<T>) -> Self {
+        value.values
     }
 }
 
@@ -106,15 +102,15 @@ mod tests {
 
     #[test]
     fn it_accesses_col_row() {
-        let original = Grid::new(2, vec![1, 2, 3, 4]);
+        let mut original = Grid::new(2, vec![1, 2, 3, 4]);
 
         assert_eq!(1, original[(0, 0)]);
         assert_eq!(2, original[(1, 0)]);
         assert_eq!(3, original[(0, 1)]);
         assert_eq!(4, original[(1, 1)]);
 
-        assert_eq!(&[1, 2], original.row(0));
-        assert_eq!(&[3, 4], original.row(1));
+        assert_eq!(&[1, 2], original.row_mut(0));
+        assert_eq!(&[3, 4], original.row_mut(1));
     }
 
     #[test]

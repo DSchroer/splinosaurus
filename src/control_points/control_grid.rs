@@ -2,6 +2,7 @@ use crate::grid::Grid;
 use crate::surfaces::UV;
 use std::ops::Index;
 
+/// 2D grid of control points.
 #[derive(Debug, Clone)]
 pub struct ControlGrid<T> {
     degree: usize,
@@ -11,6 +12,7 @@ pub struct ControlGrid<T> {
 }
 
 impl<T> ControlGrid<T> {
+    /// Construct a new control grid of `degree`.
     pub fn new(degree: usize, u_len: usize, points: Vec<T>) -> Self {
         Self {
             degree,
@@ -20,6 +22,7 @@ impl<T> ControlGrid<T> {
         }
     }
 
+    /// Length in the u direction with wrapping included.
     pub fn u_len(&self) -> usize {
         if !self.u_wrapping {
             self.points.len()
@@ -28,6 +31,7 @@ impl<T> ControlGrid<T> {
         }
     }
 
+    /// Length in the v direction with wrapping included.
     pub fn v_len(&self) -> usize {
         if !self.v_wrapping {
             self.points.height()
@@ -36,34 +40,42 @@ impl<T> ControlGrid<T> {
         }
     }
 
+    /// The degree of the curve.
     pub fn degree(&self) -> usize {
         self.degree
     }
 
+    /// Set the degree of the curve.
     pub fn set_degree(&mut self, degree: usize) {
         self.degree = degree
     }
 
+    /// Access all points.
     pub fn points(&self) -> &[T] {
         self.points.as_ref()
     }
 
+    /// Mutate all points.
     pub fn points_mut(&mut self) -> &mut [T] {
         self.points.as_mut()
     }
 
+    /// Grid wraps in the u direction.
     pub fn u_wrapping(&self) -> bool {
         self.u_wrapping
     }
 
+    /// Set if the grid wraps in the u direction.
     pub fn set_u_wrapping(&mut self, u_wrapping: bool) {
         self.u_wrapping = u_wrapping
     }
 
+    /// Grid wraps in the v direction.
     pub fn v_wrapping(&self) -> bool {
         self.v_wrapping
     }
 
+    /// Set if the grid wraps in the v direction.
     pub fn set_v_wrapping(&mut self, v_wrapping: bool) {
         self.v_wrapping = v_wrapping
     }
@@ -134,7 +146,8 @@ mod tests {
                 Vector1::new(3),
             ],
         );
-        cg.set_wrapping(true);
+        cg.set_u_wrapping(true);
+        cg.set_v_wrapping(true);
 
         assert_eq!(Vector1::new(0), cg[(2, 0)]);
         assert_eq!(Vector1::new(0), cg[(0, 2)]);

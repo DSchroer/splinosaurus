@@ -1,5 +1,4 @@
 mod b_surface;
-mod t_spline;
 
 use crate::types::{Scalar, Vector};
 use nalgebra::{DefaultAllocator, Dim};
@@ -8,25 +7,33 @@ use std::ops::RangeInclusive;
 use crate::step_iter::StepIter;
 pub use b_surface::BSurface;
 
+/// 2D surface coordinate.
 pub type UV<T> = (T, T);
 
+/// 2D spline surface.
 pub trait Surface<D: Dim, T: Scalar + 'static>: Sized
 where
     DefaultAllocator: nalgebra::allocator::Allocator<T, D>,
 {
+    /// Usable range of u values.
     fn u_range(&self) -> RangeInclusive<T>;
+    /// Usabel range of v values.
     fn v_range(&self) -> RangeInclusive<T>;
 
+    /// Point at coordinate `uv`.
     fn at(&self, uv: UV<T>) -> Vector<D, T>;
 
+    /// All the u steps along the surface.
     fn quantize_u_range(&self, step: T) -> impl ExactSizeIterator<Item = T> + Clone {
         StepIter::new(step, self.u_range())
     }
 
+    /// All the v steps along the surface.
     fn quantize_v_range(&self, step: T) -> impl ExactSizeIterator<Item = T> + Clone {
         StepIter::new(step, self.v_range())
     }
 
+    /// All the uv steps along the surface.
     fn quantize_range(&self, step: T) -> impl ExactSizeIterator<Item = UV<T>> + Clone {
         UVRange {
             u: StepIter::new(step, self.u_range()),
@@ -36,6 +43,7 @@ where
         }
     }
 
+    /// All the points along the surface.
     fn quantize(&self, step: T) -> impl ExactSizeIterator<Item = Vector<D, T>> + Clone {
         self.quantize_range(step).map(|uv| self.at(uv))
     }

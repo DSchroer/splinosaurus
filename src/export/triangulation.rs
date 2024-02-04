@@ -6,6 +6,7 @@ use nalgebra::{Const, Vector3};
 type IndexedTriangle = [usize; 3];
 type Triangle<T> = [Vector3<T>; 3];
 
+/// 3D Mesh of a given surface.
 #[derive(Debug, Clone)]
 pub struct Triangulation<T> {
     points: Vec<Vector3<T>>,
@@ -14,6 +15,8 @@ pub struct Triangulation<T> {
 }
 
 impl<T: Scalar> Triangulation<T> {
+    /// Create a new Triangulation.
+    /// `step` is the amount of detail generated.
     pub fn new(step: T, surface: &impl Surface<Const<3>, T>) -> Self {
         let u_steps = surface.quantize_u_range(step);
         let v_steps = surface.quantize_v_range(step);
@@ -69,24 +72,29 @@ impl<T: Scalar> Triangulation<T> {
         a.cross(&b)
     }
 
+    /// Points in the triangulation.
     pub fn points(&self) -> &[Vector3<T>] {
         &self.points
     }
 
+    /// Normals for each triangle.
     pub fn normals(&self) -> &[Vector3<T>] {
         &self.normals
     }
 
+    /// Triangles made up of index references of points.
     pub fn indexed_triangles(&self) -> &[IndexedTriangle] {
         &self.indexed_triangles
     }
 
+    /// Triangles made up of points.
     pub fn triangles(&self) -> impl ExactSizeIterator<Item = Triangle<T>> + '_ {
         self.indexed_triangles
             .iter()
             .map(|t| [self.points[t[0]], self.points[t[1]], self.points[t[2]]])
     }
 
+    /// Triangles made up of points with normals.
     pub fn triangles_with_normals(
         &self,
     ) -> impl ExactSizeIterator<Item = (Triangle<T>, Vector3<T>)> + '_ {
