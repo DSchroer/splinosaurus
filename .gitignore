@@ -1,3 +1,5 @@
 /target
 *.stl
+*.svg
+*.obj
 .idea

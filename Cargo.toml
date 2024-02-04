@@ -12,6 +12,6 @@ nalgebra = "0.32"
 az = "1.2"
 
 [dev-dependencies]
-pixel-canvas = "0.2"
 fixed = "1.24"
-stl_io = "0.7"
+svg = "0.15"
+obj = "0.10"
