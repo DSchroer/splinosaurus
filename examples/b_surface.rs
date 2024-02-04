@@ -3,7 +3,6 @@ use obj::{Group, IndexTuple, ObjData, Object, SimplePolygon};
 use splinosaurus::control_points::ControlGrid;
 use splinosaurus::export::Triangulation;
 use splinosaurus::surfaces::BSurface;
-use std::fs::File;
 
 fn main() {
     let mut grid = ControlGrid::new(
