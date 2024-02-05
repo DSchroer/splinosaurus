@@ -31,7 +31,6 @@ fn main() {
 
     let mut data = ObjData::default();
     data.position = Vec::from_iter(t.points().iter().map(|p| [p.x, p.y, p.z]));
-    data.normal = Vec::from_iter(t.normals().iter().map(|p| [p.x, p.y, p.z]));
     data.objects.push(Object {
         name: "surface".to_string(),
         groups: vec![Group {
