@@ -47,4 +47,9 @@ where
     pub fn max(&self) -> &Vector<D, T> {
         &self.max
     }
+
+    /// Center of the bounding box.
+    pub fn center(&self) -> Vector<D, T> {
+        (&self.min + &self.max) / T::cast_from(2)
+    }
 }
