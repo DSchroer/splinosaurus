@@ -1,5 +1,5 @@
 #![deny(missing_docs)]
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 //! A highly flexible spline and surface library.
 //!
@@ -19,6 +19,7 @@
 //! - Minimal dependencies
 
 extern crate alloc;
+extern crate core;
 
 /// Defining and manipulating control points.
 pub mod control_points;

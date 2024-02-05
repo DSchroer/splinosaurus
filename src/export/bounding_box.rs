@@ -18,13 +18,13 @@ where
     <DefaultAllocator as Allocator<T, D>>::Buffer: Default,
 {
     /// Calculate the bounding box for a set of points.
-    pub fn new(points: &[Vector<D, T>]) -> Self {
-        let mut point_iter = points.iter();
+    pub fn new<'a>(points: impl IntoIterator<Item = &'a Vector<D, T>>) -> Self {
+        let mut points = points.into_iter();
 
-        let mut min = point_iter.next().cloned().unwrap_or_default();
+        let mut min = points.next().cloned().unwrap_or_default();
         let mut max = min.clone();
 
-        for point in point_iter {
+        for point in points {
             for i in 0..point.len() {
                 if min[i] > point[i] {
                     min[i] = point[i];
@@ -51,5 +51,32 @@ where
     /// Center of the bounding box.
     pub fn center(&self) -> Vector<D, T> {
         (&self.min + &self.max) / T::cast_from(2)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::splines::{BSpline, Spline};
+    use alloc::vec::Vec;
+    use nalgebra::Vector3;
+
+    #[test]
+    fn it_calculates_for_control_points() {
+        let spline = BSpline::circle();
+        let bbox = BoundingBox::new(spline.control_points());
+
+        assert_ne!(*bbox.min(), Vector3::default());
+        assert_ne!(*bbox.max(), Vector3::default());
+    }
+
+    #[test]
+    fn it_calculates_for_spline_points() {
+        let spline = BSpline::circle();
+        let points: Vec<_> = spline.quantize(0.01).collect();
+        let bbox = BoundingBox::new(&points);
+
+        assert_ne!(*bbox.min(), Vector3::default());
+        assert_ne!(*bbox.max(), Vector3::default());
     }
 }

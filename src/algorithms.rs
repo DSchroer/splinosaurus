@@ -18,7 +18,6 @@ where
     assert!(knots.range().contains(&u.cast()), "u out of range");
 
     let k = knots.find_span(u.cast());
-
     let mut d = Vec::with_capacity(degree + 1);
     for j in 0..degree + 1 {
         let i = j + k - degree;
@@ -79,7 +78,7 @@ fn cox_de_boor<D: Dim, T: Scalar>(
     DefaultAllocator: Allocator<T, D>,
 {
     for r in 1..degree + 1 {
-        for j in (r..degree + 1).rev() {
+        for j in (r..=degree).rev() {
             let alpha = alpha(u, k, degree, r, j, knots);
             d[j] = &d[j - 1] * (T::one() - alpha) + &d[j] * alpha;
         }
@@ -88,6 +87,7 @@ fn cox_de_boor<D: Dim, T: Scalar>(
 
 fn alpha<T: Scalar>(u: T, knot_span: usize, degree: usize, r: usize, j: usize, knots: &Knots) -> T {
     let kp = T::cast_from(knots[j + knot_span - degree]);
-    let kp_1 = T::cast_from(knots[1 + j + knot_span - r]);
+    let kp_1 = T::cast_from(knots[j + 1 + knot_span - r]);
+    assert_ne!(kp, kp_1, "divide by zero");
     (u - kp) / (kp_1 - kp)
 }

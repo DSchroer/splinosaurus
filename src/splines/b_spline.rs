@@ -3,10 +3,11 @@ use crate::control_points::ControlVec;
 use crate::knots::{Knots, KnotsMut};
 use crate::splines::{NURBSpline, Spline};
 use crate::types::{Scalar, Vector};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::ops::RangeInclusive;
 use nalgebra::allocator::Allocator;
-use nalgebra::{DefaultAllocator, Dim};
+use nalgebra::{Const, DefaultAllocator, Dim, Vector2, Vector3};
 
 /// Basis spline of a single degree.
 /// https://en.wikipedia.org/wiki/B-spline
@@ -17,6 +18,51 @@ where
 {
     control_points: ControlVec<Vector<D, T>>,
     knots: Vec<usize>,
+}
+
+impl BSpline<Const<2>, f64> {
+    /// 2D Unit square.
+    pub fn square() -> Self {
+        let mut control = ControlVec::new(
+            1,
+            vec![
+                Vector2::new(-0.5, -0.5),
+                Vector2::new(0.5, -0.5),
+                Vector2::new(0.5, 0.5),
+            ],
+        );
+        control.set_wrapping(true);
+        Self::new(control)
+    }
+}
+
+impl BSpline<Const<3>, f64> {
+    /// 2D Unit circle (NURBS) of diameter 1.
+    pub fn circle() -> Self {
+        let arc_w = 1.0 / f64::sqrt(2.0);
+        let r = 0.5;
+        let mut control = ControlVec::new(
+            2,
+            vec![
+                Vector3::new(0.0, r, 1.0),
+                Vector3::new(r, r, arc_w),
+                Vector3::new(r, 0.0, 1.0),
+                Vector3::new(r, -r, arc_w),
+                Vector3::new(0.0, -r, 1.0),
+                Vector3::new(-r, -r, arc_w),
+                Vector3::new(-r, 0.0, 1.0),
+                Vector3::new(-r, r, arc_w),
+            ],
+        );
+        control.set_wrapping(true);
+        let mut curve = Self::new(control);
+        curve.knots_mut().pinch(1, 1);
+        curve.knots_mut().pinch(3, 1);
+        curve.knots_mut().pinch(5, 1);
+        curve.knots_mut().pinch(7, 1);
+        curve.knots_mut().pinch(9, 1);
+        curve
+    }
 }
 
 impl<D: Dim, T: Scalar> BSpline<D, T>
