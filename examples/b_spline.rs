@@ -1,5 +1,6 @@
 use nalgebra::Vector2;
 use splinosaurus::control_points::ControlVec;
+use splinosaurus::export::BoundingBox;
 use splinosaurus::splines::{BSpline, Spline};
 use svg::node::element::path::Data;
 use svg::node::element::Path;
@@ -17,6 +18,7 @@ fn main() {
     );
     let spline = BSpline::new(grid);
 
+    let bbox = BoundingBox::new(spline.control_points());
     let mut data = Data::new();
     for (i, p) in spline.quantize(0.01).enumerate() {
         if i == 0 {
@@ -32,7 +34,12 @@ fn main() {
         .set("stroke-width", 3)
         .set("d", data);
 
-    let document = Document::new().set("viewBox", (0, 0, 500, 500)).add(path);
+    let document = Document::new()
+        .set(
+            "viewBox",
+            (bbox.min().x, bbox.min().y, bbox.max().x, bbox.max().y),
+        )
+        .add(path);
 
     svg::save("image.svg", &document).unwrap();
 }
